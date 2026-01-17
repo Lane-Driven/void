@@ -28,29 +28,31 @@ stree_git_check() {
 
 # List recent files (modified in last N days)
 stree_recent_files() {
-    local DIR="$1"
+    local DIR="${1:-.}"
     local DAYS="${2:-2}"
     local LIMIT=5
 
-    # Combine ignore pattern into find exclusion
+    # Ignore list
     local IGNORE_PATTERN=".git|node_modules|dist"
 
-    # Find recent files while ignoring patterns
+    # Gather files
     local files=()
     while IFS= read -r f; do
         files+=("$f")
-    done < <(find "$DIR" -type f -mtime -"$DAYS" ! -path "*/.git/*" ! -path "*/node_modules/*" ! -path "*/dist/*" 2>/dev/null | sort)
+    done < <(find "$DIR" -type f -mtime -"$DAYS" \
+        ! -path "*/.git/*" \
+        ! -path "*/node_modules/*" \
+        ! -path "*/dist/*" 2>/dev/null | sort)
 
-    local count=${#files[@]}
-    (( count == 0 )) && return
+    (( ${#files[@]} == 0 )) && return
 
     echo -e "\033[1;33mRecent files (last $DAYS days):\033[0m"
-    for ((i=0; i<count && i<LIMIT; i++)); do
+    for ((i=0; i<${#files[@]} && i<LIMIT; i++)); do
         ls -lh --color=auto "${files[i]}"
     done
 
-    if (( count > LIMIT )); then
-        echo -e "\033[2m# $((count - LIMIT)) more modified files\033[0m"
+    if (( ${#files[@]} > LIMIT )); then
+        echo -e "\033[2m# $(( ${#files[@]} - LIMIT )) more modified files\033[0m"
     fi
 }
 
@@ -60,21 +62,18 @@ stree_show_tree() {
     local DEPTH="$2"
     local SHOW_HIDDEN="$3"
 
-    if [ "$SHOW_HIDDEN" = true ]; then
-        tree -C -L "$DEPTH" --dirsfirst --noreport -a "$DIR"
-    else
-        tree -C -L "$DEPTH" --dirsfirst --noreport "$DIR"
-    fi | while IFS= read -r line; do
-        # directory lines ending with /
+    local TREE_OPTS="--dirsfirst --noreport -L $DEPTH"
+    [ "$SHOW_HIDDEN" = true ] && TREE_OPTS="$TREE_OPTS -a"
+
+    tree -C $TREE_OPTS "$DIR" | while IFS= read -r line; do
         if [[ "$line" =~ ^(\[.*\][[:space:]]+)(.+)/$ ]]; then
             local prefix="${BASH_REMATCH[1]}"
             local name="${BASH_REMATCH[2]}"
             local size
-            size=$(stree_dir_size "$DIR/$name")
+            size=$(du -sh "$DIR/$name" 2>/dev/null | cut -f1)
             local display
             display=$(stree_display_path "$DIR/$name")
             printf "%s[%4s] %s/\n" "$prefix" "$size" "$display"
-        # file lines
         elif [[ -f "$line" ]]; then
             ls -lh --color=auto "$line"
         else
