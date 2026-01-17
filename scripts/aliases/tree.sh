@@ -65,21 +65,19 @@ stree_recent_files() {
     fi
 }
 
-# Display the tree itself
+# Display the tree itself, now accepting extra tree options
 stree_show_tree() {
     local DIR="$1"
-    local DEPTH="$2"
-    local SHOW_HIDDEN="$3"
+    shift
+    local TREE_OPTS=("$@")   # All remaining args are tree flags
 
-    local TREE_OPTS="--dirsfirst --noreport -L $DEPTH -I '.git'"
-    [ "$SHOW_HIDDEN" = true ] && TREE_OPTS="$TREE_OPTS -a"
+    # Always dirs first, no report
+    TREE_OPTS=("--dirsfirst" "--noreport" "${TREE_OPTS[@]}")
 
-    tree -C $TREE_OPTS "$DIR" | while IFS= read -r line; do
-        local line_clean
-        line_clean=$(echo "$line" | sed 's/\x1B\[[0-9;]*[JKmsu]//g')
-
-        # Directory lines
-        if [[ "$line_clean" =~ ^(\[.*\][[:space:]]+)(.+)/$ ]]; then
+    # Run tree with colors and options
+    tree -C "${TREE_OPTS[@]}" "$DIR" | while IFS= read -r line; do
+        # Check for directory lines like [size] name/
+        if [[ "$line" =~ ^(\[.*\][[:space:]]+)(.+)/$ ]]; then
             local prefix="${BASH_REMATCH[1]}"
             local name="${BASH_REMATCH[2]}"
             local size
@@ -87,8 +85,9 @@ stree_show_tree() {
             local display
             display=$(stree_display_path "$DIR/$name")
             printf "%s[%4s] %s/\n" "$prefix" "$size" "$display"
+        elif [[ -f "$line" ]]; then
+            ls -lh --color=auto "$line"
         else
-            # Print files and tree lines as-is
             echo "$line"
         fi
     done
@@ -102,31 +101,34 @@ stree() {
     local SHOW_HIDDEN=false
     local DEPTH
 
-    [ "$1" == "-a" ] && { SHOW_HIDDEN=true; DIR="${2:-.}"; }
+    # Check for -a option
+    if [[ "$1" == "-a" ]]; then
+        SHOW_HIDDEN=true
+        DIR="${2:-.}"
+        shift 2
+    fi
 
     DEPTH=$(stree_get_depth "$DIR")
     stree_git_check "$DIR"
     stree_recent_files "$DIR"
-    stree_show_tree "$DIR" "$DEPTH" "$SHOW_HIDDEN"
+
+    if [ "$SHOW_HIDDEN" = true ]; then
+        stree_show_tree "$DIR" "-a" "-L" "$DEPTH" "$@"
+    else
+        stree_show_tree "$DIR" "-L" "$DEPTH" "$@"
+    fi
 }
 
 streeh() {
-    local DIR="."
-    local TREE_ARGS=(-a -I '.git')  # default args for streeh
-
-    # If first arg is a directory, shift it
-    if [ -d "$1" ]; then
-        DIR="$1"
-        shift
-    fi
-
-    # Allow user to append extra tree arguments
-    TREE_ARGS+=("$@")
+    local DIR="${1:-.}"
+    shift   # shift past DIR if provided
 
     local DEPTH
     DEPTH=$(stree_get_depth "$DIR")
 
     stree_git_check "$DIR"
     stree_recent_files "$DIR"
-    stree_show_tree "$DIR" "$DEPTH" "${TREE_ARGS[@]}"
+
+    # Pass -a (show hidden), -I '.git', and max depth
+    stree_show_tree "$DIR" "-a" "-I" ".git" "-L" "$DEPTH" "$@"
 }
