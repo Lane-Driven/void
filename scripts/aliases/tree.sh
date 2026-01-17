@@ -111,12 +111,22 @@ stree() {
 }
 
 streeh() {
-    local DIR="${1:-.}"
+    local DIR="."
+    local TREE_ARGS=(-a -I '.git')  # default args for streeh
+
+    # If first arg is a directory, shift it
+    if [ -d "$1" ]; then
+        DIR="$1"
+        shift
+    fi
+
+    # Allow user to append extra tree arguments
+    TREE_ARGS+=("$@")
+
     local DEPTH
     DEPTH=$(stree_get_depth "$DIR")
 
     stree_git_check "$DIR"
     stree_recent_files "$DIR"
-    stree_show_tree "$DIR" "$DEPTH" true
+    stree_show_tree "$DIR" "$DEPTH" "${TREE_ARGS[@]}"
 }
-
