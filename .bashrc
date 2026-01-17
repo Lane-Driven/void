@@ -1,7 +1,8 @@
 # Source all scripts in $HOME/Projects/void/scripts recursively
-find "$HOME/Projects/void/scripts" -type f -name "*.sh" | sort | while read -r f; do
-    if [ -f "$f" ]; then
-        source "$f"
-    fi
-done
+SCRIPTS_DIR="$HOME/Projects/void/scripts"
+
+[ -d "$SCRIPTS_DIR" ] && \
+while IFS= read -r f; do
+    [ -f "$f" ] && source "$f"
+done < <(find "$SCRIPTS_DIR" -type f -name "*.sh" | sort)
 
