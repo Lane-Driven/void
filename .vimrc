@@ -59,8 +59,6 @@ Plug 'vim-airline/vim-airline-themes'
 
 Plug 'tpope/vim-fugitive'
 
-Plug 'neoclide/coc.nvim', { 'branch': 'release' }
-
 Plug 'tpope/vim-commentary'
 
 Plug 'tpope/vim-surround'
@@ -73,15 +71,6 @@ call plug#end()
 
 colorscheme onedark
 
-nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
-
-
-inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm() : "\<C-g>u\<CR>"
-
-nnoremap <C-n> :NERDTreeToggle<CR>
 let NERDTreeQuitOnOpen=1
 
 nnoremap <C-p> :Files<CR>
@@ -95,7 +84,7 @@ nmap <leader>Q :qa!<CR>
 
 nnoremap <leader>h :nohl<CR>
 
-nnoremap <leader>n :NERDTreeFocus<CR>
+nnoremap <leader>n :NERDTreeToggle<CR>
 
 nnoremap H 0
 vnoremap H 0
