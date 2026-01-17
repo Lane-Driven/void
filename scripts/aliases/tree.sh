@@ -32,18 +32,20 @@ stree_recent_files() {
     local DAYS="${2:-2}"
     local LIMIT=5
 
-    local files
-    mapfile -t files < <(
-        find "$DIR" -type f -mtime -"$DAYS" -print
-    )
+    # Combine ignore pattern into find exclusion
+    local IGNORE_PATTERN=".git|node_modules|dist"
 
-    local count="${#files[@]}"
+    # Find recent files while ignoring patterns
+    local files=()
+    while IFS= read -r f; do
+        files+=("$f")
+    done < <(find "$DIR" -type f -mtime -"$DAYS" ! -path "*/.git/*" ! -path "*/node_modules/*" ! -path "*/dist/*" 2>/dev/null | sort)
 
+    local count=${#files[@]}
     (( count == 0 )) && return
 
     echo -e "\033[1;33mRecent files (last $DAYS days):\033[0m"
-
-    for (( i=0; i< count && i< LIMIT; i++ )); do
+    for ((i=0; i<count && i<LIMIT; i++)); do
         ls -lh --color=auto "${files[i]}"
     done
 
@@ -58,17 +60,23 @@ stree_show_tree() {
     local DEPTH="$2"
     local SHOW_HIDDEN="$3"
 
-    local CMD="tree -C -L $DEPTH --dirsfirst --noreport"
-    [ "$SHOW_HIDDEN" = true ] && CMD="$CMD -a"
-
-    $CMD "$DIR" | while IFS= read -r line; do
-        # Match directory lines (ending with /)
-        if [[ "$line" =~ (.*)[[:space:]]+([^[:space:]]+)/$ ]]; then
+    if [ "$SHOW_HIDDEN" = true ]; then
+        tree -C -L "$DEPTH" --dirsfirst --noreport -a "$DIR"
+    else
+        tree -C -L "$DEPTH" --dirsfirst --noreport "$DIR"
+    fi | while IFS= read -r line; do
+        # directory lines ending with /
+        if [[ "$line" =~ ^(\[.*\][[:space:]]+)(.+)/$ ]]; then
             local prefix="${BASH_REMATCH[1]}"
             local name="${BASH_REMATCH[2]}"
             local size
             size=$(stree_dir_size "$DIR/$name")
-            printf "%s[%4s] %s/\n" "$prefix" "$size" "$name"
+            local display
+            display=$(stree_display_path "$DIR/$name")
+            printf "%s[%4s] %s/\n" "$prefix" "$size" "$display"
+        # file lines
+        elif [[ -f "$line" ]]; then
+            ls -lh --color=auto "$line"
         else
             echo "$line"
         fi
@@ -100,3 +108,12 @@ stree() {
     stree_show_tree "$DIR" "$DEPTH" "$SHOW_HIDDEN"
 }
 
+streeh() {
+    local DIR="${1:-.}"
+    local DEPTH
+    DEPTH=$(stree_get_depth "$DIR")
+    
+    stree_git_check "$DIR"
+    stree_recent_files "$DIR"
+    stree_show_tree "$DIR" "$DEPTH" true  # true = show hidden
+}
