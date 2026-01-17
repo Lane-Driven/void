@@ -2,11 +2,22 @@
 # Modular Super Tree Function
 # -----------------------------
 
+# Convert absolute paths to display-friendly (replace $HOME with ~)
+stree_display_path() {
+    local path="$1"
+    if [[ "$path" == "$HOME"* ]]; then
+        echo "~${path#$HOME}"
+    else
+        echo "$path"
+    fi
+}
+
+# Get directory size in human-readable format
 stree_dir_size() {
     du -sh "$1" 2>/dev/null | cut -f1
 }
 
-# Get smart depth based on number of top-level items
+# Smart tree depth based on top-level item count
 stree_get_depth() {
     local DIR="$1"
     local COUNT
@@ -20,7 +31,7 @@ stree_get_depth() {
     fi
 }
 
-# Detect if folder is a Git repository
+# Detect Git repository
 stree_git_check() {
     local DIR="$1"
     [ -d "$DIR/.git" ] && echo -e "\033[1;34mGit repository detected in $DIR\033[0m"
@@ -32,10 +43,6 @@ stree_recent_files() {
     local DAYS="${2:-2}"
     local LIMIT=5
 
-    # Ignore list
-    local IGNORE_PATTERN=".git|node_modules|dist"
-
-    # Gather files
     local files=()
     while IFS= read -r f; do
         files+=("$f")
@@ -48,7 +55,9 @@ stree_recent_files() {
 
     echo -e "\033[1;33mRecent files (last $DAYS days):\033[0m"
     for ((i=0; i<${#files[@]} && i<LIMIT; i++)); do
-        ls -lh --color=auto "${files[i]}"
+        local file_display
+        file_display=$(stree_display_path "${files[i]}")
+        ls -lh --color=auto "${files[i]}" | sed "s|${files[i]}|$file_display|"
     done
 
     if (( ${#files[@]} > LIMIT )); then
@@ -62,11 +71,15 @@ stree_show_tree() {
     local DEPTH="$2"
     local SHOW_HIDDEN="$3"
 
-    local TREE_OPTS="--dirsfirst --noreport -L $DEPTH"
+    local TREE_OPTS="--dirsfirst --noreport -L $DEPTH -I '.git'"
     [ "$SHOW_HIDDEN" = true ] && TREE_OPTS="$TREE_OPTS -a"
 
     tree -C $TREE_OPTS "$DIR" | while IFS= read -r line; do
-        if [[ "$line" =~ ^(\[.*\][[:space:]]+)(.+)/$ ]]; then
+        local line_clean
+        line_clean=$(echo "$line" | sed 's/\x1B\[[0-9;]*[JKmsu]//g')
+
+        # Directory lines
+        if [[ "$line_clean" =~ ^(\[.*\][[:space:]]+)(.+)/$ ]]; then
             local prefix="${BASH_REMATCH[1]}"
             local name="${BASH_REMATCH[2]}"
             local size
@@ -74,36 +87,26 @@ stree_show_tree() {
             local display
             display=$(stree_display_path "$DIR/$name")
             printf "%s[%4s] %s/\n" "$prefix" "$size" "$display"
-        elif [[ -f "$line" ]]; then
-            ls -lh --color=auto "$line"
         else
+            # Print files and tree lines as-is
             echo "$line"
         fi
     done
 }
 
-# Main super tree function
+# -----------------------------
+# Main super tree functions
+# -----------------------------
 stree() {
     local DIR="${1:-.}"
     local SHOW_HIDDEN=false
     local DEPTH
 
-    # Check for -a option
-    if [[ "$1" == "-a" ]]; then
-        SHOW_HIDDEN=true
-        DIR="${2:-.}"
-    fi
+    [ "$1" == "-a" ] && { SHOW_HIDDEN=true; DIR="${2:-.}"; }
 
-    # Calculate depth
     DEPTH=$(stree_get_depth "$DIR")
-
-    # Git repo check
     stree_git_check "$DIR"
-
-    # Recent files
     stree_recent_files "$DIR"
-
-    # Show tree
     stree_show_tree "$DIR" "$DEPTH" "$SHOW_HIDDEN"
 }
 
@@ -111,8 +114,9 @@ streeh() {
     local DIR="${1:-.}"
     local DEPTH
     DEPTH=$(stree_get_depth "$DIR")
-    
+
     stree_git_check "$DIR"
     stree_recent_files "$DIR"
-    stree_show_tree "$DIR" "$DEPTH" true  # true = show hidden
+    stree_show_tree "$DIR" "$DEPTH" true
 }
+
