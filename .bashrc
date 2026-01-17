@@ -1,10 +1,7 @@
-update_vimrc() {
-    cd ~/Projects/void || return
-    git pull
-    cp .vimrc ~/.vimrc
-    echo 'Updated .vimrc!'
-}
+# Source all scripts in $HOME/Projects/void/scripts recursively
+find "$HOME/Projects/void/scripts" -type f -name "*.sh" | sort | while read -r f; do
+    if [ -f "$f" ]; then
+        source "$f"
+    fi
+done
 
-alias ud-vimrc='update_vimrc'
-
-source $HOME/Projects/void/scripts/welcome_void/welcome

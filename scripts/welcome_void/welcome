@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-welcome_void() {
-    echo "Welcome to the void!"
-}
