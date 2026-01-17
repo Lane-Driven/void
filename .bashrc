@@ -6,3 +6,5 @@ update_vimrc() {
 }
 
 alias ud-vimrc='update_vimrc'
+
+source $HOME/Projects/void/scripts/welcome_void/welcome
