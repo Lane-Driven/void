@@ -92,4 +92,4 @@ nnoremap L $
 vnoremap L $
 
 nnoremap <C-u> <C-u>zz
-nnoremap <C-d>
+nnoremap <C-d> <C-d>zz
