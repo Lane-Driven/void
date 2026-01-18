@@ -1,7 +1,8 @@
+#!/usr/bin/env bash
 # -----------------------------
 # Modular Super Tree Function
 # -----------------------------
-source "./../colors/colors.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../colors/colors.sh"
 
 # Convert absolute paths to display-friendly (replace $HOME with ~)
 stree_display_path() {
