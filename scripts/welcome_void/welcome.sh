@@ -1,6 +1,39 @@
 # -----------------------------
 # Void update utilities
 # -----------------------------
+# -----------------------------
+# Show recent notes on welcome
+# -----------------------------
+welcome_recent_notes() {
+    local COUNT=5   # Number of notes to display
+    local NOTES_FILE="$HOME/notes/notes.txt"
+
+    # Colors
+    local COLOR_RESET="\033[0m"
+    local COLOR_TIMESTAMP="\033[1;34m"   # bright blue
+    local COLOR_NOTE="\033[1;37m"        # white
+    local COLOR_HIGHLIGHT="\033[1;33m"   # yellow
+    local COLOR_URGENT="\033[1;31m"      # red for urgent notes
+
+    [ -f "$NOTES_FILE" ] || return 0  # No notes file, skip
+
+    local TOTAL_LINES
+    TOTAL_LINES=$(wc -l < "$NOTES_FILE")
+    (( TOTAL_LINES == 0 )) && return 0  # Empty file, skip
+
+    echo -e "${COLOR_HIGHLIGHT}Recent notes:${COLOR_RESET}"
+    tail -n "$COUNT" "$NOTES_FILE" | while IFS= read -r line; do
+        local TS="${line%%]*}]"
+        local CONTENT="${line#*] }"
+
+        if [[ "$CONTENT" == !* ]]; then
+            # Urgent note, highlight in red
+            echo -e "${COLOR_TIMESTAMP}${TS}${COLOR_RESET} ${COLOR_URGENT}${CONTENT}${COLOR_RESET}"
+        else
+            echo -e "${COLOR_TIMESTAMP}${TS}${COLOR_RESET} ${COLOR_NOTE}${CONTENT}${COLOR_RESET}"
+        fi
+    done
+}
 
 # Path to update log
 void_update_logfile() {
@@ -92,7 +125,8 @@ welcome_void() {
     echo -e "${MAGENTA}Uptime: ${CYAN}$UPTIME"
     echo -e "${MAGENTA}Current directory: ${CYAN}$PWD"
     echo -e "${CYAN}=====================================${RESET}"
-
+    
+    welcome_recent_notes
     prompt_update
 }
 
