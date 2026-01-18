@@ -2,6 +2,7 @@
 # source "$(dirname "${BASH_SOURCE[0]}")/../colors/colors.sh"
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 . "SCRIPT_DIR/../colors/colors.sh"
+printf "DEGUB: ${SCRIPT_DIR}\n"
 
 ui_git_branch() {
     if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
