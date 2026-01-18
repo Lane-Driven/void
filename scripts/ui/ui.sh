@@ -4,7 +4,7 @@
 UI_RESET="\[\033[0m\]"
 UI_GREEN="\[\033[1;32m\]"
 UI_BLUE="\[\033[1;34m\]"
-UI_YELLOW="\[\033[1;1;93m\]"
+UI_YELLOW="\[\033[38;5;226m\]"
 
 # Get Git branch
 ui_git_branch() {
