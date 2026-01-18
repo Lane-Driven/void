@@ -35,7 +35,13 @@ stree_dir_display() {
 # Centralized size calculation for files and directories
 stree_dir_size() {
     local PATH="$1"
-    [ -e "$PATH" ] && du -sh "$PATH" 2>/dev/null | /user/bincut -f1 || echo "?"
+    echo "DEBUG: Checking path: $PATH" >&2
+    echo "DEBUG: PATH is $PATH" >&2
+    if [ -e "$PATH" ]; then
+        /usr/bin/du -sh "$PATH" 2>/dev/null | /usr/bin/cut -f1
+    else
+        echo "?"
+    fi
 }
 
 # Smart tree depth based on top-level item count
