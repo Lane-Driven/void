@@ -140,11 +140,11 @@ notes_search() {
 
 # Help
 notes_help() {
-    echo -e "${COLOR_YELLOW}Notes prefixes and meaning:${COLOR_RESET}"
-    echo -e "${COLOR_RED}!\t${COLOR_WHITE}Urgent / High Priority"
-    echo -e "${COLOR_BRIGHT_RED}!!\t${COLOR_WHITE}Critical / Immediate Action"
-    echo -e "${COLOR_YELLOW}!?\t${COLOR_WHITE}Question / Follow-up needed"
-    echo -e "${COLOR_CYAN}!@\t${COLOR_WHITE}Reminder / Scheduled task"
+    printf "${COLOR_YELLOW}Notes prefixes and meaning:${COLOR_RESET}"
+    printf "${COLOR_RED}!\t${COLOR_WHITE}Urgent / High Priority"
+    printf "${COLOR_BRIGHT_RED}!!\t${COLOR_WHITE}Critical / Immediate Action"
+    printf "${COLOR_YELLOW}!?\t${COLOR_WHITE}Question / Follow-up needed"
+    printf "${COLOR_CYAN}!@\t${COLOR_WHITE}Reminder / Scheduled task"
     echo -e "${COLOR_GREEN}!+\t${COLOR_WHITE}Idea / Enhancement"
     echo -e "${COLOR_MAGENTA}!- \t${COLOR_WHITE}Bug / Issue"
     echo -e "${COLOR_BLUE}!~\t${COLOR_WHITE}WIP / Work in progress"
@@ -160,7 +160,7 @@ notes_clear() {
     fi
 
     if [ ! -f "$NOTES_FILE" ]; then
-        echo "Notes file does not exist."
+        printf "Notes file does not exist.\n"
         return 1
     fi
 
@@ -170,7 +170,7 @@ notes_clear() {
         case "$CONFIRM" in
             [yY]|[yY][eE][sS]) ;;
             *) 
-                echo "Aborted. No notes were deleted."
+                printf "Aborted. No notes were deleted.\n"
                 return 1
                 ;;
         esac
@@ -178,7 +178,7 @@ notes_clear() {
 
     # Clear the notes file
     : > "$NOTES_FILE"
-    echo -e "${COLOR_YELLOW}All notes have been deleted.${COLOR_RESET}"
+    printf "${COLOR_YELLOW}%s\n${COLOR_RESET}" "All notes have been deleted."
 }
 
 # Command dispatcher - POSIX compliant
@@ -191,15 +191,17 @@ notes() {
         printf "${COLOR_YELLOW}%s${COLOR_RESET}\n" "Notes file location: $NOTES_FILE"
         read -rp "Would you like to create a new note? [y/N] " CONFIRM
         case "$CONFIRM" in
-            [yY][yY][eE][sS]) ;;
+            [yY][yY][eE][sS]) 
+                ;;
             *)
                 printf "%s\n" "Usage: notes {add|list|search|help|clear} [args]"
                 return 1
                 ;;
         esac
+
         printf "${COLOR_YELLOW}%s${COLOR_RESET}\n" "Opening editor to add a new note..."
 
-        # Use $EDITOR or fallback to vi
+        # Use $EDITOR or fallback to vim
         EDITOR_CMD="${EDITOR:-vim}"
 
         # Temporary file
