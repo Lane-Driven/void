@@ -61,35 +61,39 @@ notes_list() {
 
     NOTE_COUNT=$(notes_count)
 
+    # No notes is NOT an error
     if [ "$NOTE_COUNT" -eq 0 ]; then
         echo "${COLOR_YELLOW}No notes to display.${COLOR_RESET}"
         return 0
     fi
 
+    # Invalid count cases ARE errors
     if [ "$COUNT" -eq 0 ]; then
-        echo "${COLOR_YELLOW}Count must be for at least one note!${COLOR_RESET}"
-        reutrn 1
+        echo "${COLOR_YELLOW}Count must be at least 1.${COLOR_RESET}"
+        return 1
     fi
 
     if [ "$COUNT" -lt 0 ]; then
-        echo "${COLOR_YELLOW}Count cannot be negative!${COLOR_RESET}"
+        echo "${COLOR_YELLOW}Count cannot be negative.${COLOR_RESET}"
         return 1
-    if [ "$COUNT" -gt "$NOTE_COUNT" ]; then
-        COUNT=$NOTE_COUNT
     fi
 
-    # Decide to show header or not.  Useful if auto loading notes like
-    # from a welcome screen.
+    # Clamp COUNT to NOTE_COUNT
+    if [ "$COUNT" -gt "$NOTE_COUNT" ]; then
+        COUNT="$NOTE_COUNT"
+    fi
+
+    # Optional header (useful for welcome screen)
     if [ "$SHOW_HEADER" = true ]; then
         echo -e "${COLOR_YELLOW}Last $COUNT notes:${COLOR_RESET}"
     fi
 
     tail -n "$COUNT" "$NOTES_FILE" | while IFS= read -r line; do
-        local TS="${line%%]*}]"
-        local CONTENT="${line#*] }"
-        local COLOR=$(notes_get_color "$CONTENT")
+        TS="${line%%]*}]"
+        CONTENT="${line#*] }"
+        COLOR=$(notes_get_color "$CONTENT")
 
-        echo -e "${COLOR_BLUE}${TS}${COLOR_BLUE} ${COLOR}${CONTENT}${COLOR_RESET}"
+        echo -e "${COLOR_BLUE}${TS}${COLOR_RESET} ${COLOR}${CONTENT}${COLOR_RESET}"
     done
 
     return 0
