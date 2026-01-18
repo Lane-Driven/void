@@ -194,6 +194,7 @@ notes() {
             [yY][yY][eE][sS]) 
                 ;;
             *)
+                printf "${CONFIRM}\n"
                 printf "%s\n" "Usage: notes {add|list|search|help|clear} [args]"
                 return 1
                 ;;
