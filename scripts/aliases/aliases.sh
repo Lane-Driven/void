@@ -1,3 +1,4 @@
+#!/bin/sh
 alias update="update_void"
 # IMPORTANT
 alias install="sudo xbps-install -y"
@@ -17,30 +18,30 @@ alias top='btm'
 
 # Function to list common Git + git-extras commands
 git_help() {
-    echo "=== Common Git Commands ==="
-    echo "git status       - Show current repo status"
-    echo "git add .        - Stage all changes"
-    echo "git commit -m '' - Commit staged changes"
-    echo "git log          - View commit history"
-    echo "git log --oneline --graph --decorate --all - Compact log view"
-    echo "git diff         - Show changes since last commit"
-    echo "git branch       - List branches"
-    echo "git checkout <branch> - Switch branch"
-    echo "git merge <branch>    - Merge another branch"
-    echo "git pull         - Fetch and merge updates from remote"
-    echo "git push         - Push commits to remote"
+    printf "=== Common Git Commands ===\n"
+    printf "git status       - Show current repo status\n"
+    printf "git add .        - Stage all changes\n"
+    printf "git commit -m '' - Commit staged changes\n"
+    printf "git log          - View commit history\n"
+    printf "git log --oneline --graph --decorate --all - Compact log view\n"
+    printf "git diff         - Show changes since last commit\n"
+    printf "git branch       - List branches\n"
+    printf "git checkout <branch> - Switch branch\n"
+    printf "git merge <branch>    - Merge another branch\n"
+    printf "git pull         - Fetch and merge updates from remote\n"
+    printf "git push         - Push commits to remote\n"
 
-    echo ""
-    echo "=== Git Extras Commands ==="
-    echo "git summary      - Quick summary of the repository"
-    echo "git changelog    - Generate changelog from commits"
-    echo "git ignore       - Add patterns to .gitignore"
-    echo "git fresh-branch - Create a new branch based on default"
-    echo "git effort       - Show commit effort by author"
-    echo "git info         - Detailed repo info"
+    printf "\n"
+    printf "=== Git Extras Commands ===\n"
+    printf "git summary      - Quick summary of the repository\n"
+    printf "git changelog    - Generate changelog from commits\n"
+    printf "git ignore       - Add patterns to .gitignore\n"
+    printf "git fresh-branch - Create a new branch based on default\n"
+    printf "git effort       - Show commit effort by author\n"
+    printf "git info         - Detailed repo info\n"
 
-    echo ""
-    echo "Tip: You can add more aliases or explore 'git help -a' for all available commands."
+    printf "\n"
+    printf "Tip: You can add more aliases or explore 'git help -a' for all available commands.\n"
 }
 
 alias git_help="git_help"
