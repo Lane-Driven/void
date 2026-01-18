@@ -31,19 +31,19 @@ notes_count_by_prefix() {
     awk -v prefix="$PREFIX" '
     {
         content = $0
-        # Strip timestamp
+        # strip timestamp
         sub(/^\[[^]]*\] /, "", content)
 
-        # Match exact prefix
-        if (prefix ~ /^!$/) {
-            # Single ! must not be followed by another !
-            if (content ~ /^![^!]/ || content == "!") count++
+        # Exact matching logic
+        if (prefix == "!") {
+            # Only single !, not followed by another ! or ? or + or ~ or -
+            if (content ~ /^![^!?\+~-]/ || content == "!") count++
         } else {
-            # Multi-char prefix must match exactly
+            # Multi-character prefix must match exactly at start
             if (content ~ "^" prefix) count++
         }
     }
-    END { print count + 0 }' "$NOTES_FILE"
+    END { print count+0 }' "$NOTES_FILE"
 }
 
 # Map prefixes to colors
