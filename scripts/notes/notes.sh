@@ -56,7 +56,6 @@ notes_list() {
         local TS="${line%%]*}]"
         local CONTENT="${line#*] }"
         local COLOR=$(notes_get_color "$CONTENT")
-        echo ${COLOR}
 
         echo -e "${COLOR_BLUE}${TS}${COLOR_BLUE} ${COLOR}${CONTENT}${COLOR_RESET}"
     done
