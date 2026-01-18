@@ -48,15 +48,19 @@ notes_search() {
         echo -e "${COLOR_HIGHLIGHT}Usage: notes search \"keyword\"${COLOR_RESET}"
         return 1
     fi
-    grep -i --color=always "$QUERY" "$NOTES_FILE" | while IFS= read -r line; do
+
+    while IFS= read -r line; do
         local TS="${line%%]*}]"
         local CONTENT="${line#*] }"
-        # Highlight the search term
+
+        # Use perl for case-insensitive highlight without repeating
         local HIGHLIGHTED_CONTENT
-        HIGHLIGHTED_CONTENT=$(echo "$CONTENT" | sed "s/$QUERY/${COLOR_HIGHLIGHT}&${COLOR_NOTE}/Ig")
-        echo -e "${COLOR_TIMESTAMP}${TS}${COLOR_RESET} ${COLOR_NOTE}   ${HIGHLIGHTED_CONTENT}   ${COLOR_RESET}"
-    done
+        HIGHLIGHTED_CONTENT=$(echo "$CONTENT" | perl -pe "s/($QUERY)/${COLOR_HIGHLIGHT}\$1${COLOR_NOTE}/ig")
+
+        echo -e "${COLOR_TIMESTAMP}${TS}${COLOR_RESET} ${COLOR_NOTE}${HIGHLIGHTED_CONTENT}${COLOR_RESET}"
+    done < <(grep -i "$QUERY" "$NOTES_FILE")
 }
+
 
 # Command dispatcher
 notes() {
