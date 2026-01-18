@@ -133,6 +133,12 @@ notes_search() {
         COLOR=$(notes_get_color "$CONTENT")
         # Highlight search term
         HIGHLIGHTED
+        HIGHLIGHTED=$(printf '%s\n' "$CONTENT" | awk -v q="$QUERY" '
+        {
+            IGNORECASE = 1
+            gsub(q, "\033[1;33m&\033[0m")
+            print
+        }')
         HIGHLIGHTED=$(echo "$CONTENT" | perl -pe "s/($QUERY)/\e[1;33m\$1\e[0m/ig")
         printf "${TS} ${HIGHLIGHTED}${COLOR_RESET}"
     done
