@@ -3,7 +3,7 @@
 # Modular Super Tree Function
 # -----------------------------
 #source "$(dirname "${BASH_SOURCE[0]}")/../colors/colors.sh"
-shellcheck -x . "$SCRIPTS_DIR/colors/colors.sh"
+. "$SCRIPTS_DIR/colors/colors.sh"
 # Convert absolute paths to display-friendly (replace $HOME with ~)
 stree_display_path() {
     STREE_PATH="$1"
@@ -27,12 +27,10 @@ stree_dir_display() {
     INDENT="$3" # leading spaces for tree alignment
 
     FULLPATH="$PARENT/$NAME"
-    local SIZE
+    SIZE='?'
 
     if [ -e "$FULLPATH" ]; then
-        SIZE=$(du -sh "$FULLPATH" 2>/dev/null | cut -f1)
-    else
-        SIZE="?"
+        SIZE=$(du -s "$FULLPATH" 2>/dev/null | awk '{print $1}')
     fi
 
     printf "%s[%4s] %s/\n" "$INDENT" "$SIZE" "$NAME"
