@@ -193,7 +193,7 @@ notes() {
         case "$CONFIRM" in
             [yY][yY][eE][sS]) ;;
             *)
-                printf "%s" "Usage: notes {add|list|search|help|clear} [args]"
+                printf "%s\n" "Usage: notes {add|list|search|help|clear} [args]"
                 return 1
                 ;;
         esac
