@@ -12,7 +12,8 @@ alias gl='git log --oneline --graph --decorate --all'
 alias gp='git pull'
 
 alias rbash="source ~/.bashrc"
-
+alias btm='btm --theme nord'
+alias top='btm'
 
 # Function to list common Git + git-extras commands
 git_help() {
