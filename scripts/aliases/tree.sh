@@ -84,21 +84,45 @@ stree_recent_files() {
     fi
 }
 
-# Display the tree itself, now accepting extra tree options
+# Get tree options safely
+stree_tree_opts() {
+    local DEPTH="$1"
+    local SHOW_HIDDEN="$2"
+
+    # Ensure minimum depth of 1
+    DEPTH=$(( DEPTH < 1 ? 1 : DEPTH ))
+
+    local OPTS="--dirsfirst --noreport -L $DEPTH"
+
+    # Show hidden files if requested
+    [ "$SHOW_HIDDEN" = true ] && OPTS="$OPTS -a"
+
+    # Always ignore .git
+    OPTS="$OPTS -I .git"
+
+    echo "$OPTS"
+}
+
+# Display the tree itself
 stree_show_tree() {
     local DIR="$1"
     local DEPTH="$2"
     local SHOW_HIDDEN="$3"
 
-    local TREE_OPTS="--dirsfirst --noreport -L $DEPTH"
-    [ "$SHOW_HIDDEN" = true ] && TREE_OPTS="$TREE_OPTS -a"
+    local TREE_OPTS
+    TREE_OPTS=$(stree_tree_opts "$DEPTH" "$SHOW_HIDDEN")
 
     tree -C $TREE_OPTS "$DIR" | while IFS= read -r line; do
-        # Match directories only
-        if [[ "$line" =~ ^([[:space:]]*)([^/]+/) ]]; then
-            local indent="${BASH_REMATCH[1]}"
-            local name="${BASH_REMATCH[2]%/}"  # remove trailing slash
-            stree_dir_display "$DIR" "$name" "$indent"
+        if [[ "$line" =~ ^(\[.*\][[:space:]]+)(.+)/$ ]]; then
+            local prefix="${BASH_REMATCH[1]}"
+            local name="${BASH_REMATCH[2]}"
+            local size
+            size=$(stree_dir_size "$DIR/$name")   # centralized size calculation
+            local display
+            display=$(stree_display_path "$DIR/$name")
+            printf "%s[%4s] %s/\n" "$prefix" "$size" "$display"
+        elif [[ -f "$line" ]]; then
+            ls -lh --color=auto "$line"
         else
             echo "$line"
         fi
@@ -133,14 +157,11 @@ stree() {
 
 streeh() {
     local DIR="${1:-.}"
-    shift   # shift past DIR if provided
-
     local DEPTH
     DEPTH=$(stree_get_depth "$DIR")
-
+    
     stree_git_check "$DIR"
     stree_recent_files "$DIR"
-
-    # Pass -a (show hidden), -I '.git', and max depth
-    stree_show_tree "$DIR" "-a" "-I" ".git" "-L" "$DEPTH" "$@"
+    stree_show_tree "$DIR" "$DEPTH" true  # true = show hidden (excluding .git)
 }
+
