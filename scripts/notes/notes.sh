@@ -10,7 +10,7 @@ mkdir -p "$NOTES_DIR"
 touch "$NOTES_FILE"
 
 # Source shared colors
-source "./../colors/colors.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../colors/colors.sh"
 
 # Map prefixes to colors
 notes_get_color() {

@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
-
-# Colors
-UI_RESET="\[\033[0m\]"
-UI_GREEN="\[\033[1;32m\]"
-UI_BLUE="\[\033[1;34m\]"
-UI_YELLOW="\[\033[38;5;226m\]"
+source "$(dirname "${BASH_SOURCE[0]}")/../colors/colors.sh"
 
 # Get Git branch
 ui_git_branch() {
@@ -17,9 +12,8 @@ ui_git_branch() {
 
 # Build PS1 dynamically
 ui_set_prompt() {
-    PS1="${UI_GREEN}[\u@\h ${UI_BLUE}\W${UI_GREEN}]${UI_YELLOW}\$(ui_git_branch)${UI_RESET} \$ "
+    PS1="${COLOR_GREEN}[\u@\h ${COLOR_BLUE}\W${COLOR_GREEN}]${COLOR_YELLOW}\$(ui_git_branch)${COLOR_RESET} \$ "
 }
 
 # Apply
 ui_set_prompt
-
