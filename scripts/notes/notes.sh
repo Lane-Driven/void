@@ -50,7 +50,7 @@ notes_get_color() {
         "!@"*) echo "$COLOR_CYAN" ;;
         "!+"*) echo "$COLOR_GREEN" ;;
         "!-"*) echo "$COLOR_MAGENTA" ;;
-        "!~"*) echo "$COLOR_BLUE" ;;
+        "!~"*) echo "$COLOR_SKY_BLUE" ;;
         "!"*) echo "$COLOR_RED" ;;
         *)    echo "$COLOR_WHITE" ;;
     esac
@@ -63,7 +63,7 @@ notes_add() {
         printf "${COLOR_YELLOW}Usage: notes add 'Your note here'${COLOR_RESET}\n"
         return 1
     fi
-    local TIMESTAMP
+     
     TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S")
     echo "[$TIMESTAMP] $NOTE" >> "$NOTES_FILE"
     printf "${COLOR_YELLOW}Note added!${COLOR_RESET}\n"
@@ -127,7 +127,7 @@ notes_search() {
         return 1
     fi
     
-    # consider --color=always
+    # consider --color=always to color timestamp hits
     grep -i "$QUERY" "$NOTES_FILE" | while IFS= read -r line; do
         TS="${line%%]*}]"
         CONTENT="${line#*] }"
@@ -154,7 +154,7 @@ notes_help() {
     printf "${COLOR_CYAN}!@\t${COLOR_WHITE}Reminder / Scheduled task\n"
     printf "${COLOR_GREEN}!+\t${COLOR_WHITE}Idea / Enhancement\n"
     printf "${COLOR_MAGENTA}!- \t${COLOR_WHITE}Bug / Issue\n"
-    printf "${COLOR_BLUE}!~\t${COLOR_WHITE}WIP / Work in progress\n"
+    printf "${COLOR_SKY_BLUE}!~\t${COLOR_WHITE}WIP / Work in progress\n"
 }
 
 # Clear all notes, optionally with force
