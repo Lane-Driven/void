@@ -191,10 +191,10 @@ notes() {
         printf "${COLOR_YELLOW}%s${COLOR_RESET}\n" "Notes file location: $NOTES_FILE"
         read -rp "Would you like to create a new note? [y/N] " CONFIRM
         case "$CONFIRM" in
-            [yY][yY][eE][sS]) 
+            [yY]*) 
                 ;;
             *)
-                printf "${CONFIRM}\n"
+                printf "DEGUG: ${CONFIRM}\n"
                 printf "%s\n" "Usage: notes {add|list|search|help|clear} [args]"
                 return 1
                 ;;
