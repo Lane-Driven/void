@@ -54,6 +54,11 @@ notes_list() {
     done
 }
 
+notes_list_last() {
+    local COUNT="${1:-5}"
+    notes_list "$COUNT"
+}
+
 # Search notes
 notes_search() {
     local QUERY="$*"

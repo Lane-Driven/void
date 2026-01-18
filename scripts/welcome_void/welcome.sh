@@ -10,26 +10,10 @@ source "$(dirname "${BASH_SOURCE[0]}")/../notes/notes.sh"
 # -----------------------------
 welcome_recent_notes() {
     local COUNT=5   # Number of notes to display
-    local NOTES_FILE="$NOTES_FILE" # from notes.sh
 
-    [ -f "$NOTES_FILE" ] || return 0  # No notes file, skip
-
-    local TOTAL_LINES
-    TOTAL_LINES=$(wc -l < "$NOTES_FILE")
-    (( TOTAL_LINES == 0 )) && return 0  # Empty file, skip
-
-    echo -e "${COLOR_YELLOW}Recent notes:${COLOR_RESET}"
-    tail -n "$COUNT" "$NOTES_FILE" | while IFS= read -r line; do
-        local TS="${line%%]*}]"
-        local CONTENT="${line#*] }"
-
-        if [[ "$CONTENT" == !* ]]; then
-            # Urgent note, highlight in red
-            echo -e "${COLOR_BLUE}${TS}${COLOR_RESET} ${COLOR_RED}${CONTENT}${COLOR_RESET}"
-        else
-            echo -e "${COLOR_BLUE}${TS}${COLOR_RESET} ${COLOR_WHITE}${CONTENT}${COLOR_RESET}"
-        fi
-    done
+    echo
+    echo -e "${COLOR_CYAN}Recent notes:${COLOR_RESET}"
+    notes_list_last $COUNT  # ../notes/notes.sh
 }
 
 # Path to update log
