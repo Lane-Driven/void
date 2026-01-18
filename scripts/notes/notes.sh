@@ -100,7 +100,7 @@ notes_search() {
         local CONTENT="${line#*] }"
         # Highlight search term within the note content
         local HIGHLIGHTED_CONTENT
-        HIGHLIGHTED_CONTENT=$(echo "$CONTENT" | sed "s/$QUERY/\033[1;93m&\033[0m/Ig")
+        HIGHLIGHTED_CONTENT=$(echo "$CONTENT" |  perl -pe "s/(\Q$QUERY\E)/${COLOR_HIGHLIGHT}\$1${COLOR_NOTE}/ig")
         echo -e "${COLOR_TIMESTAMP}${TS}${COLOR_RESET} $(notes_colorize "$HIGHLIGHTED_CONTENT")"
     done
 }
