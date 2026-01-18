@@ -6,11 +6,24 @@
 NOTES_DIR="$HOME/notes"
 NOTES_FILE="$NOTES_DIR/notes.txt"
 
+GREP_PREFIXES='^[[][^]]*]'
+
 mkdir -p "$NOTES_DIR"
 touch "$NOTES_FILE"
 
 # Source shared colors
 source "$(dirname "${BASH_SOURCE[0]}")/../colors/colors.sh"
+
+notes_count() {
+    [[ -f "$NOTES_FILE" ]] || { echo 0; return; }
+    grep -c . "$NOTES_FILE"
+}
+
+notes_count_by_prefix() {
+    local PREFIX="$1"
+    [[ -f "$NOTES_FILE" ]] || { echo 0; return; }
+    grep -c "${GREP_PREFIXES} ${PREFIX}" "$NOTES_FILE"
+}
 
 # Map prefixes to colors
 notes_get_color() {
@@ -43,12 +56,31 @@ notes_add() {
 
 # List notes
 notes_list() {
-    local COUNT="${1:-10}"
+    COUNT="${1:-10}"
+    SHOW_HEADER="${2:-true}"
+
+    NOTE_COUNT=$(notes_count)
+
+    if [ "$NOTE_COUNT" -eq 0 ]; then
+        echo "${COLOR_YELLOW}No notes to display.${COLOR_RESET}"
+        return 0
+    fi
+
+    if [ "$COUNT" -eq 0 ]; then
+        echo "${COLOR_YELLOW}Count must be for at least one note!${COLOR_RESET}"
+        reutrn 1
+    fi
+
+    if [ "$COUNT" -lt 0 ]; then
+        echo "${COLOR_YELLOW}Count cannot be negative!${COLOR_RESET}"
+        return 1
+    if [ "$COUNT" -gt "$NOTE_COUNT" ]; then
+        COUNT=$NOTE_COUNT
+    fi
 
     # Decide to show header or not.  Useful if auto loading notes like
     # from a welcome screen.
-    local SHOW_HEADER="${2:-true}"
-    if [[ "$SHOW_HEADER" == true ]]; then
+    if [ "$SHOW_HEADER" = true ]; then
         echo -e "${COLOR_YELLOW}Last $COUNT notes:${COLOR_RESET}"
     fi
 
@@ -59,6 +91,8 @@ notes_list() {
 
         echo -e "${COLOR_BLUE}${TS}${COLOR_BLUE} ${COLOR}${CONTENT}${COLOR_RESET}"
     done
+
+    return 0
 }
 
 notes_list_last() {
