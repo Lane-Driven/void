@@ -14,7 +14,7 @@ ui_git_branch() {
 }
 
 ui_set_prompt() {
-    PS1=$(printf '%s[%s@%s %s]%s%s%s $ ' \
+    PS1=$(printf '%s[%s@%s %s%s]%s%s%s $ ' \
         "$COLOR_GREEN" \
         "$USER" \
         "$(hostname)" \
