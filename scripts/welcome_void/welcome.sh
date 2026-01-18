@@ -1,19 +1,15 @@
-# -----------------------------
+#!/usr/bin/env bash
 # Void update utilities
 # -----------------------------
+source "./../colors/colors.sh"
+source "./../notes/notes.sh"
+
 # -----------------------------
 # Show recent notes on welcome
 # -----------------------------
 welcome_recent_notes() {
     local COUNT=5   # Number of notes to display
-    local NOTES_FILE="$HOME/notes/notes.txt"
-
-    # Colors
-    local COLOR_RESET="\033[0m"
-    local COLOR_TIMESTAMP="\033[1;34m"   # bright blue
-    local COLOR_NOTE="\033[1;37m"        # white
-    local COLOR_HIGHLIGHT="\033[1;33m"   # yellow
-    local COLOR_URGENT="\033[1;31m"      # red for urgent notes
+    local NOTES_FILE="$NOTES_FILE" # from notes.sh
 
     [ -f "$NOTES_FILE" ] || return 0  # No notes file, skip
 
@@ -21,16 +17,16 @@ welcome_recent_notes() {
     TOTAL_LINES=$(wc -l < "$NOTES_FILE")
     (( TOTAL_LINES == 0 )) && return 0  # Empty file, skip
 
-    echo -e "${COLOR_HIGHLIGHT}Recent notes:${COLOR_RESET}"
+    echo -e "${COLOR_YELLOW}Recent notes:${COLOR_RESET}"
     tail -n "$COUNT" "$NOTES_FILE" | while IFS= read -r line; do
         local TS="${line%%]*}]"
         local CONTENT="${line#*] }"
 
         if [[ "$CONTENT" == !* ]]; then
             # Urgent note, highlight in red
-            echo -e "${COLOR_TIMESTAMP}${TS}${COLOR_RESET} ${COLOR_URGENT}${CONTENT}${COLOR_RESET}"
+            echo -e "${COLOR_BLUE}${TS}${COLOR_RESET} ${COLOR_RED}${CONTENT}${COLOR_RESET}"
         else
-            echo -e "${COLOR_TIMESTAMP}${TS}${COLOR_RESET} ${COLOR_NOTE}${CONTENT}${COLOR_RESET}"
+            echo -e "${COLOR_BLUE}${TS}${COLOR_RESET} ${COLOR_WHITE}${CONTENT}${COLOR_RESET}"
         fi
     done
 }
@@ -87,9 +83,9 @@ prompt_update() {
 
     # 3 days = 259200 seconds
     if (( diff == 0 )); then
-        echo -e "\033[1;33mIt looks like you haven't updated yet. Run \`update_void\`!\033[0m"
+        echo -e "${COLOR_YELLOW}It looks like you haven't updated yet. Run \`update_void\`!${COLOR_RESET}"
     elif (( diff > 259200 )); then
-        echo -e "\033[1;33mIt's been more than 3 days since last update. Consider running \`update_void\`!\033[0m"
+        echo -e "${COLOR_YELLOW}It's been more than 3 days since last update. Consider running \`update_void\`!${COLOR_RESET}"
     fi
 }
 
@@ -100,15 +96,6 @@ welcome_void() {
     local LAST_UPDATE_OUT
     LAST_UPDATE_OUT=$(void_update_human)
 
-    # Colors
-    local RED="\033[0;31m"
-    local GREEN="\033[0;32m"
-    local YELLOW="\033[0;33m"
-    local BLUE="\033[0;34m"
-    local MAGENTA="\033[0;35m"
-    local CYAN="\033[0;36m"
-    local RESET="\033[0m"
-
     # OS info
     local NAME ID KERNEL ARCH UPTIME
     NAME=$(grep ^PRETTY_NAME= /etc/os-release | cut -d= -f2 | tr -d '"')
@@ -117,14 +104,14 @@ welcome_void() {
     ARCH=$(uname -m)
     UPTIME=$(uptime -p)
 
-    echo -e "${CYAN}=====================================${RESET}"
-    echo -e "${GREEN}Welcome, ${YELLOW}$USER${GREEN}!"
-    echo -e "${MAGENTA}System: ${CYAN}$NAME (${ID})"
-    echo -e "${MAGENTA}Kernel: ${CYAN}$KERNEL [$ARCH]"
-    echo -e "${MAGENTA}Last update: ${CYAN}$LAST_UPDATE_OUT"
-    echo -e "${MAGENTA}Uptime: ${CYAN}$UPTIME"
-    echo -e "${MAGENTA}Current directory: ${CYAN}$PWD"
-    echo -e "${CYAN}=====================================${RESET}"
+    echo -e "${COLOR_CYAN}=====================================${COLOR_RESET}"
+    echo -e "${COLOR_GREEN}Welcome, ${COLOR_YELLOW}$USER${COLOR_GREEN}!"
+    echo -e "${COLOR_MAGENTA}System: ${COLOR_CYAN}$NAME (${ID})"
+    echo -e "${COLOR_MAGENTA}Kernel: ${COLOR_CYAN}$KERNEL [$ARCH]"
+    echo -e "${COLOR_MAGENTA}Last update: ${COLOR_CYAN}$LAST_UPDATE_OUT"
+    echo -e "${COLOR_MAGENTA}Uptime: ${COLOR_CYAN}$UPTIME"
+    echo -e "${COLOR_MAGENTA}Current directory: ${COLOR_CYAN}$PWD"
+    echo -e "${COLOR_CYAN}=====================================${COLOR_RESET}"
     
     welcome_recent_notes
     prompt_update

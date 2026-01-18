@@ -1,6 +1,7 @@
 # -----------------------------
 # Modular Super Tree Function
 # -----------------------------
+source "./../colors/colors.sh"
 
 # Convert absolute paths to display-friendly (replace $HOME with ~)
 stree_display_path() {
@@ -66,7 +67,7 @@ stree_get_depth() {
 # Detect Git repository
 stree_git_check() {
     local DIR="$1"
-    [ -d "$DIR/.git" ] && echo -e "\033[1;34mGit repository detected in $DIR\033[0m"
+    [ -d "$DIR/.git" ] && echo -e "${COLOR_BLUE}Git repository detected in $DIR${COLOR_RESET}"
 }
 
 # -----------------------------
@@ -99,7 +100,7 @@ stree_recent_files() {
     local LIMIT=5
     local COUNT=0
 
-    echo -e "\033[1;33mRecent files (last $DAYS days):\033[0m"
+    echo -e "${COLOR_YELLOW}Recent files (last $DAYS days):${COLOR_RESET}"
 
     # Use process substitution to avoid subshell issues
     while IFS= read -r file; do
@@ -107,7 +108,7 @@ stree_recent_files() {
         ((COUNT <= LIMIT)) && stree_display_recent_file "$file"
     done < <(stree_find_recent_files "$DIR" "$DAYS" "$SHOW_HIDDEN")
 
-    (( COUNT > LIMIT )) && echo -e "\033[2m# $(( COUNT - LIMIT )) more modified files\033[0m"
+    (( COUNT > LIMIT )) && echo -e "${COLOR_DIM}# $(( COUNT - LIMIT )) more modified files${COLOR_RESET}"
 }
 
 # -----------------------------

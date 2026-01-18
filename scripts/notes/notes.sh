@@ -6,129 +6,94 @@
 NOTES_DIR="$HOME/notes"
 NOTES_FILE="$NOTES_DIR/notes.txt"
 
-# Ensure the notes directory exists
 mkdir -p "$NOTES_DIR"
 touch "$NOTES_FILE"
 
-# Colors
-COLOR_RESET="\033[0m"
-COLOR_TIMESTAMP="\033[1;34m"   # bright blue for timestamp
-COLOR_DEFAULT="\033[1;37m"     # white for normal notes
+# Source shared colors
+source "./../colors/colors.sh"
 
-# Note type prefixes and colors
-declare -A NOTE_TYPES=(
-    ["!"]="\033[1;31m"   # Urgent / Red
-    ["!!"]="\033[1;91m"  # Critical / Bright Red
-    ["!?"]="\033[1;33m"  # Question / Yellow
-    ["!@"]="\033[1;36m"  # Reminder / Cyan
-    ["!+"]="\033[1;32m"  # Idea / Green
-    ["!-"]="\033[1;35m"  # Bug / Magenta
-    ["!~"]="\033[1;34m"  # WIP / Blue
-)
-
-NOTE_MEANINGS=(
-    "! : Urgent / High Priority"
-    "!! : Critical / Immediate Action"
-    "!? : Question / Follow-up needed"
-    "!@ : Reminder / Scheduled task"
-    "!+ : Idea / Enhancement"
-    "!– : Bug / Issue"
-    "!~ : Work in Progress"
-)
-
-# -----------------------------
-# Helper: Determine note color
-# -----------------------------
-notes_colorize() {
+# Map prefixes to colors
+notes_get_color() {
     local NOTE="$1"
-    local PREFIX
-    local CONTENT="$NOTE"
-    local COLOR="$COLOR_DEFAULT"
-
-    # Check for multi-character prefixes first
-    for key in "${!NOTE_TYPES[@]}"; do
-        if [[ "$NOTE" == "$key"* ]]; then
-            PREFIX="$key"
-            CONTENT="${NOTE#"$key"}"
-            COLOR="${NOTE_TYPES[$key]}"
-            break
-        fi
-    done
-
-    echo -e "${COLOR}${CONTENT}${COLOR_RESET}"
+    local PREFIX="${NOTE%% *}"  # take first word for prefix
+    case "$PREFIX" in
+        "!!") echo "$COLOR_BRIGHT_RED" ;;
+        "!")  echo "$COLOR_RED" ;;
+        "!?") echo "$COLOR_YELLOW" ;;
+        "!@") echo "$COLOR_CYAN" ;;
+        "!+") echo "$COLOR_GREEN" ;;
+        "!-") echo "$COLOR_MAGENTA" ;;
+        "!~") echo "$COLOR_BLUE" ;;
+        *)    echo "$COLOR_WHITE" ;;
+    esac
 }
 
-# -----------------------------
 # Add a new note
-# -----------------------------
 notes_add() {
     local NOTE="$*"
     if [[ -z "$NOTE" ]]; then
-        echo -e "\033[1;33mUsage: notes add \"!Note content\"${COLOR_RESET}"
+        echo -e "${COLOR_YELLOW}Usage: notes add \"Your note here\"${COLOR_RESET}"
         return 1
     fi
     local TIMESTAMP
     TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S")
     echo "[$TIMESTAMP] $NOTE" >> "$NOTES_FILE"
-    echo -e "\033[1;33mNote added!${COLOR_RESET}"
+    echo -e "${COLOR_YELLOW}Note added!${COLOR_RESET}"
 }
 
-# -----------------------------
-# List recent notes
-# -----------------------------
+# List notes
 notes_list() {
     local COUNT="${1:-10}"
-    echo -e "\033[1;33mLast $COUNT notes:${COLOR_RESET}"
+    echo -e "${COLOR_YELLOW}Last $COUNT notes:${COLOR_RESET}"
+
     tail -n "$COUNT" "$NOTES_FILE" | while IFS= read -r line; do
         local TS="${line%%]*}]"
         local CONTENT="${line#*] }"
-        echo -e "${COLOR_TIMESTAMP}${TS}${COLOR_RESET} $(notes_colorize "$CONTENT")"
+        local COLOR=$(notes_get_color "$CONTENT")
+        echo -e "${COLOR_TIMESTAMP}${TS}${COLOR_RESET} ${COLOR}${CONTENT}${COLOR_RESET}"
     done
 }
 
-# -----------------------------
 # Search notes
-# -----------------------------
 notes_search() {
     local QUERY="$*"
     if [[ -z "$QUERY" ]]; then
-        echo -e "\033[1;33mUsage: notes search \"keyword\"${COLOR_RESET}"
+        echo -e "${COLOR_YELLOW}Usage: notes search \"keyword\"${COLOR_RESET}"
         return 1
     fi
+
     grep -i --color=always "$QUERY" "$NOTES_FILE" | while IFS= read -r line; do
         local TS="${line%%]*}]"
         local CONTENT="${line#*] }"
-        # Highlight search term within the note content
-        local HIGHLIGHTED_CONTENT
-        HIGHLIGHTED_CONTENT=$(echo "$CONTENT" |  perl -pe "s/(\Q$QUERY\E)/${COLOR_HIGHLIGHT}\$1${COLOR_NOTE}/ig")
-        echo -e "${COLOR_TIMESTAMP}${TS}${COLOR_RESET} $(notes_colorize "$HIGHLIGHTED_CONTENT")"
+        local COLOR=$(notes_get_color "$CONTENT")
+        # Highlight search term
+        local HIGHLIGHTED
+        HIGHLIGHTED=$(echo "$CONTENT" | perl -pe "s/($QUERY)/\e[1;33m\$1\e[0m/ig")
+        echo -e "${COLOR_TIMESTAMP}${TS}${COLOR_RESET} ${COLOR}${HIGHLIGHTED}${COLOR_RESET}"
     done
 }
 
-# -----------------------------
-# Display note type help
-# -----------------------------
+# Help
 notes_help() {
-    echo -e "\033[1;33mNote Types:\033[0m"
-    for entry in "${NOTE_MEANINGS[@]}"; do
-        # Extract prefix
-        PREFIX="${entry%%:*}"
-        echo -e "${NOTE_TYPES[$PREFIX]}$entry${COLOR_RESET}"
-    done
+    echo -e "${COLOR_YELLOW}Notes prefixes and meaning:${COLOR_RESET}"
+    echo -e "${COLOR_RED}!\t${COLOR_WHITE}Urgent / High Priority"
+    echo -e "${COLOR_BRIGHT_RED}!!\t${COLOR_WHITE}Critical / Immediate Action"
+    echo -e "${COLOR_YELLOW}!?\t${COLOR_WHITE}Question / Follow-up needed"
+    echo -e "${COLOR_CYAN}!@\t${COLOR_WHITE}Reminder / Scheduled task"
+    echo -e "${COLOR_GREEN}!+\t${COLOR_WHITE}Idea / Enhancement"
+    echo -e "${COLOR_MAGENTA}!- \t${COLOR_WHITE}Bug / Issue"
+    echo -e "${COLOR_BLUE}!~\t${COLOR_WHITE}WIP / Work in progress"
 }
 
-# -----------------------------
 # Command dispatcher
-# -----------------------------
 notes() {
     local CMD="$1"
     shift
     case "$CMD" in
-        add) notes_add "$@" ;;
-        list) notes_list "$@" ;;
+        add)    notes_add "$@" ;;
+        list)   notes_list "$@" ;;
         search) notes_search "$@" ;;
-        help) notes_help ;;
-        *) echo -e "\033[1;33mUsage: notes {add|list|search|help} [args]${COLOR_RESET}" ;;
+        help)   notes_help ;;
+        *)      echo -e "${COLOR_YELLOW}Usage: notes {add|list|search|help} [args]${COLOR_RESET}" ;;
     esac
 }
-
