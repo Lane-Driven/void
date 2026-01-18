@@ -52,7 +52,7 @@ notes_list() {
         local COLOR=$(notes_get_color "$CONTENT")
         echo ${COLOR}
 
-        echo -e "${COLOR_BLUE}${TS}${COLOR_RESET} ${COLOR}${CONTENT}${COLOR_RESET}"
+        echo -e "${COLOR_BLUE}${TS}${COLOR_BLUE} ${COLOR}${CONTENT}${COLOR_RESET}"
     done
 }
 
