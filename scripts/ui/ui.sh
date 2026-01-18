@@ -17,7 +17,7 @@ ui_git_branch() {
     if git rev-parse --is-inside-work-tree &>/dev/null; then
         local BRANCH
         BRANCH=$(git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD 2>/dev/null)
-        echo " ${UI_YELLOW}(${BRANCH})${UI_RESET}"
+        echo -n "\[${UI_YELLOW}(${BRANCH})${UI_RESET}\]"
     fi
 }
 
