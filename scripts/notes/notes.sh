@@ -6,8 +6,6 @@
 NOTES_DIR="$HOME/notes"
 NOTES_FILE="$NOTES_DIR/notes.txt"
 
-GREP_PREFIXES='^[[][^]]*]'
-
 mkdir -p "$NOTES_DIR"
 touch "$NOTES_FILE"
 
@@ -152,15 +150,88 @@ notes_help() {
     echo -e "${COLOR_BLUE}!~\t${COLOR_WHITE}WIP / Work in progress"
 }
 
-# Command dispatcher
+# Clear all notes, optionally with force
+notes_clear() {
+    FORCE=false
+
+    # Check for -f flag
+    if [ "$1" = "-f" ]; then
+        FORCE=true
+    fi
+
+    if [ ! -f "$NOTES_FILE" ]; then
+        echo "Notes file does not exist."
+        return 1
+    fi
+
+    if [ "$FORCE" = false ]; then
+        # Confirm with the user
+        read -rp "Are you sure you want to delete ALL notes? [y/N] " CONFIRM
+        case "$CONFIRM" in
+            [yY]|[yY][eE][sS]) ;;
+            *) 
+                echo "Aborted. No notes were deleted."
+                return 1
+                ;;
+        esac
+    fi
+
+    # Clear the notes file
+    : > "$NOTES_FILE"
+    echo -e "${COLOR_YELLOW}All notes have been deleted.${COLOR_RESET}"
+}
+
+# Command dispatcher - POSIX compliant
 notes() {
-    local CMD="$1"
+    CMD="$1"
     shift
+
+    # No arguments: open editor for a new note
+    if [ -z "$CMD" ]; then
+        printf "%s%s%s\n" "$COLOR_YELLOW" "Notes file location: $NOTES_FILE" "$COLOR_RESET"
+        printf "%s%s%s\n" "$COLOR_YELLOW" "Opening editor to add a new note..." "$COLOR_RESET"
+
+        # Use $EDITOR or fallback to vi
+        EDITOR_CMD="${EDITOR:-vi}"
+
+        # Temporary file
+        TMPFILE="/tmp/notes.$$"
+
+        # Open editor
+        "$EDITOR_CMD" "$TMPFILE"
+
+        # Add note if file is non-empty
+        if [ -s "$TMPFILE" ]; then
+            NOTE=$(cat "$TMPFILE")
+            notes_add "$NOTE"
+        else
+            printf "%s%s%s\n" "$COLOR_YELLOW" "No note added." "$COLOR_RESET"
+        fi
+
+        # Clean up
+        rm -f "$TMPFILE"
+        return 0
+    fi
+
     case "$CMD" in
-        add)    notes_add "$@" ;;
-        list)   notes_list "$@" ;;
-        search) notes_search "$@" ;;
-        help)   notes_help ;;
-        *)      echo -e "${COLOR_YELLOW}Usage: notes {add|list|search|help} [args]${COLOR_RESET}" ;;
+        add)
+            notes_add "$@"
+            ;;
+        list)
+            notes_list "$@"
+            ;;
+        search)
+            notes_search "$@"
+            ;;
+        help)
+            notes_help
+            ;;
+        clear)
+            notes_clear "$@"
+            ;;
+        *)
+            printf "%s%s%s\n" "$COLOR_YELLOW" "Usage: notes {add|list|search|help|clear} [args]" "$COLOR_RESET"
+            ;;
     esac
 }
+
