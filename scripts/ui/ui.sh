@@ -1,18 +1,27 @@
-#!/usr/bin/env bash
-source "$(dirname "${BASH_SOURCE[0]}")/../colors/colors.sh"
+#!/bin/sh
+# source "$(dirname "${BASH_SOURCE[0]}")/../colors/colors.sh"
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+. "SCRIPT_DIR/../colors/colors.sh"
 
-# Get Git branch
 ui_git_branch() {
-    if git rev-parse --is-inside-work-tree &>/dev/null; then
-        local branch
-        branch=$(git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD 2>/dev/null)
-        echo "(${branch})"
+    if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+        branch=$(git symbolic-ref --short HEAD 2>/dev/null)
+        if [ -z "$branch" ]; then
+            branch=$(git rev-parse --short HEAD 2>/dev/null)
+        fi
+        printf '(%s)' "$branch"
     fi
 }
 
-# Build PS1 dynamically
 ui_set_prompt() {
-    PS1="${COLOR_GREEN}[\u@\h ${COLOR_BLUE}\W${COLOR_GREEN}]${COLOR_YELLOW}\$(ui_git_branch)${COLOR_RESET} \$ "
+    PS1=$(printf '%s[%s@%s %s]%s%s%s $ ' \
+        "$COLOR_GREEN" \
+        "$USER" \
+        "$(hostname)" \
+        "$(basename "$PWD")" \
+        "$COLOR_YELLOW" \
+        "$(ui_git_branch)" \
+        "$COLOR_RESET")
 }
 
 # Apply
