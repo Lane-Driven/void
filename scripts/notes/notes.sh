@@ -15,17 +15,15 @@ source "$(dirname "${BASH_SOURCE[0]}")/../colors/colors.sh"
 # Map prefixes to colors
 notes_get_color() {
     local NOTE="$1"
-    local PREFIX="${NOTE%% *}"  # take first word for prefix
-    # TODO: Debug
-    echo ${PREFIX}
-    case "$PREFIX" in
-        "!!") echo "$COLOR_BRIGHT_RED" ;;
-        "!")  echo "$COLOR_RED" ;;
-        "!?") echo "$COLOR_YELLOW" ;;
-        "!@") echo "$COLOR_CYAN" ;;
-        "!+") echo "$COLOR_GREEN" ;;
-        "!-") echo "$COLOR_MAGENTA" ;;
-        "!~") echo "$COLOR_BLUE" ;;
+
+    case "$NOTE" in
+        "!!"*) echo "$COLOR_BRIGHT_RED" ;;
+        "!"*)  echo "$COLOR_RED" ;;
+        "!?"*) echo "$COLOR_YELLOW" ;;
+        "!@"*) echo "$COLOR_CYAN" ;;
+        "!+"*) echo "$COLOR_GREEN" ;;
+        "!-"*) echo "$COLOR_MAGENTA" ;;
+        "!~"*) echo "$COLOR_BLUE" ;;
         *)    echo "$COLOR_WHITE" ;;
     esac
 }
@@ -52,8 +50,7 @@ notes_list() {
         local TS="${line%%]*}]"
         local CONTENT="${line#*] }"
         local COLOR=$(notes_get_color "$CONTENT")
-        # TODO: Debug
-        echo ${COLOR}
+
         echo -e "${COLOR_BLUE}${TS}${COLOR_RESET} ${COLOR}${CONTENT}${COLOR_RESET}"
     done
 }
