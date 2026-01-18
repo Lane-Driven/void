@@ -132,7 +132,6 @@ notes_search() {
         CONTENT="${line#*] }"
         COLOR=$(notes_get_color "$CONTENT")
         # Highlight search term
-        HIGHLIGHTED
         HIGHLIGHTED=$(printf '%s\n' "$CONTENT" | awk -v q="$QUERY" '
         {
             IGNORECASE = 1
