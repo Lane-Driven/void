@@ -17,7 +17,7 @@ ui_git_branch() {
 
 # Build PS1 dynamically
 ui_set_prompt() {
-    PS1="${UI_GREEN}[\u@\h ${UI_BLUE}\w${UI_GREEN}]${UI_YELLOW}\$(ui_git_branch)${UI_RESET} \$ "
+    PS1="${UI_GREEN}[\u@\h ${UI_BLUE}\W${UI_GREEN}]${UI_YELLOW}\$(ui_git_branch)${UI_RESET} \$ "
 }
 
 # Apply
