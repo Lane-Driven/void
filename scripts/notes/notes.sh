@@ -18,12 +18,12 @@ notes_get_color() {
 
     case "$NOTE" in
         "!!"*) echo "$COLOR_BRIGHT_RED" ;;
-        "!"*)  echo "$COLOR_RED" ;;
-        "!?"*) echo "$COLOR_YELLOW" ;;
+        "!?"*)  echo "$COLOR_YELLOW" ;;
         "!@"*) echo "$COLOR_CYAN" ;;
         "!+"*) echo "$COLOR_GREEN" ;;
         "!-"*) echo "$COLOR_MAGENTA" ;;
         "!~"*) echo "$COLOR_BLUE" ;;
+        "!"*) echo "$COLOR_RED" ;;
         *)    echo "$COLOR_WHITE" ;;
     esac
 }
@@ -44,7 +44,13 @@ notes_add() {
 # List notes
 notes_list() {
     local COUNT="${1:-10}"
-    echo -e "${COLOR_YELLOW}Last $COUNT notes:${COLOR_RESET}"
+
+    # Decide to show header or not.  Useful if auto loading notes like
+    # from a welcome screen.
+    local SHOW_HEADER="${2:-true}"
+    if [[ "$SHOW_HEADER" == true ]]; then
+        echo -e "${COLOR_YELLOW}Last $COUNT notes:${COLOR_RESET}"
+    fi
 
     tail -n "$COUNT" "$NOTES_FILE" | while IFS= read -r line; do
         local TS="${line%%]*}]"
@@ -58,7 +64,7 @@ notes_list() {
 
 notes_list_last() {
     local COUNT="${1:-5}"
-    notes_list "$COUNT"
+    notes_list "$COUNT" false
 }
 
 # Search notes
