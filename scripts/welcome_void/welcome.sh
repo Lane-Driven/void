@@ -1,19 +1,38 @@
 # -----------------------------
-# ~/.bashrc additions for a colorful welcome
+# Void update utilities
 # -----------------------------
 
-# Function to get last update time
-LAST_UPDATE() {
-    local LOGFILE="/var/log/void_update.log"
+# Path to update log
+void_update_logfile() {
+    echo "/var/log/void_update.log"
+}
 
-    # If log file doesn't exist
-    [ -f "$LOGFILE" ] || { echo "Never"; return; }
+# Get last update epoch (seconds since 1970)
+void_update_last_epoch() {
+    local LOGFILE
+    LOGFILE=$(void_update_logfile)
 
-    local last_epoch
-    last_epoch=$(date -d "$(cat "$LOGFILE")" +%s)
-    local now_epoch
+    if [ ! -f "$LOGFILE" ]; then
+        echo 0  # never updated
+        return
+    fi
+
+    date -d "$(cat "$LOGFILE")" +%s 2>/dev/null || echo 0
+}
+
+# Seconds since last update
+void_update_seconds_since() {
+    local last_epoch now_epoch diff
+    last_epoch=$(void_update_last_epoch)
     now_epoch=$(date +%s)
-    local diff=$(( now_epoch - last_epoch ))
+    diff=$(( now_epoch - last_epoch ))
+    echo "$diff"
+}
+
+# Human-readable last update
+void_update_human() {
+    local diff
+    diff=$(void_update_seconds_since)
 
     if (( diff < 60 )); then
         echo "< 1 min"
@@ -28,32 +47,25 @@ LAST_UPDATE() {
     fi
 }
 
-# Function to prompt for update if more than 3 days
+# Prompt user if update is older than threshold (3 days)
 prompt_update() {
-    local LOGFILE="/var/log/void_update.log"
+    local diff
+    diff=$(void_update_seconds_since)
 
-    # If log doesn't exist, suggest update
-    if [ ! -f "$LOGFILE" ]; then
-        echo -e "\033[1;33mIt looks like you haven't updated yet. Run \`update_void\` to update!\033[0m"
-        return
-    fi
-
-    local last_epoch
-    last_epoch=$(date -d "$(cat "$LOGFILE")" +%s)
-    local now_epoch
-    now_epoch=$(date +%s)
-    local diff=$(( now_epoch - last_epoch ))
-
-    # Threshold: 3 days = 259200 seconds
-    if (( diff > 259200 )); then
-        echo -e "\033[1;33mIt's been more than 3 days since the last update. Consider running \`update_void\`!\033[0m"
+    # 3 days = 259200 seconds
+    if (( diff == 0 )); then
+        echo -e "\033[1;33mIt looks like you haven't updated yet. Run \`update_void\`!\033[0m"
+    elif (( diff > 259200 )); then
+        echo -e "\033[1;33mIt's been more than 3 days since last update. Consider running \`update_void\`!\033[0m"
     fi
 }
 
-# Welcome function
+# -----------------------------
+# Welcome screen
+# -----------------------------
 welcome_void() {
     local LAST_UPDATE_OUT
-    LAST_UPDATE_OUT=$(LAST_UPDATE)
+    LAST_UPDATE_OUT=$(void_update_human)
 
     # Colors
     local RED="\033[0;31m"
@@ -64,14 +76,10 @@ welcome_void() {
     local CYAN="\033[0;36m"
     local RESET="\033[0m"
 
-    # Read OS info
-    local NAME
+    # OS info
+    local NAME ID KERNEL ARCH UPTIME
     NAME=$(grep ^PRETTY_NAME= /etc/os-release | cut -d= -f2 | tr -d '"')
-    local ID
     ID=$(grep ^ID= /etc/os-release | cut -d= -f2 | tr -d '"')
-
-    # System info
-    local KERNEL ARCH UPTIME
     KERNEL=$(uname -r)
     ARCH=$(uname -m)
     UPTIME=$(uptime -p)
@@ -85,7 +93,6 @@ welcome_void() {
     echo -e "${MAGENTA}Current directory: ${CYAN}$PWD"
     echo -e "${CYAN}=====================================${RESET}"
 
-    # Check for update
     prompt_update
 }
 
