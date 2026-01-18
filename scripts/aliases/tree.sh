@@ -2,27 +2,31 @@
 # -----------------------------
 # Modular Super Tree Function
 # -----------------------------
-source "$(dirname "${BASH_SOURCE[0]}")/../colors/colors.sh"
-
+#source "$(dirname "${BASH_SOURCE[0]}")/../colors/colors.sh"
+shellcheck -x . "$SCRIPTS_DIR/colors/colors.sh"
 # Convert absolute paths to display-friendly (replace $HOME with ~)
 stree_display_path() {
-    local path="$1"
-    if [[ "$path" == "$HOME"* ]]; then
-        echo "~${path#$HOME}"
-    else
-        echo "$path"
-    fi
+    STREE_PATH="$1"
+
+    case $STREE_PATH in
+        "$HOME"/*)
+            printf '~%s\n' "${STREE_PATH#"$HOME"}"
+            ;;
+        *)
+            printf '%s\n' "$STREE_PATH"
+            ;;
+    esac
 }
 
 # -----------------------------
 # Display a single directory with size
 # -----------------------------
 stree_dir_display() {
-    local PARENT="$1"
-    local NAME="$2"   # directory name
-    local INDENT="$3" # leading spaces for tree alignment
+    PARENT="$1"
+    NAME="$2"   # directory name
+    INDENT="$3" # leading spaces for tree alignment
 
-    local FULLPATH="$PARENT/$NAME"
+    FULLPATH="$PARENT/$NAME"
     local SIZE
 
     if [ -e "$FULLPATH" ]; then
@@ -36,7 +40,7 @@ stree_dir_display() {
 
 # Centralized size calculation for files and directories
 stree_dir_size() {
-    local PATH_TO_CHECK="$1"
+    PATH_TO_CHECK="$1"
     if [ -e "$PATH_TO_CHECK" ]; then
         size=$(/usr/bin/du -sh "$PATH_TO_CHECK" 2>/dev/null)
         # du outputs like "4.0K   ./file"
