@@ -37,7 +37,12 @@ notes_list() {
         # Split timestamp and note content
         local TS="${line%%]*}]"
         local CONTENT="${line#*] }"
-        echo -e "${COLOR_TIMESTAMP}${TS}${COLOR_RESET} ${COLOR_NOTE}${CONTENT}${COLOR_RESET}"
+
+        # Set base color based on urgency
+        local NOTE_COLOR="$COLOR_NOTE"
+        [[ "$CONTENT" == \!* ]] && NOTE_COLOR="\033[1;31m"  # Red for urgent notes
+
+        echo -e "${COLOR_TIMESTAMP}${TS}${COLOR_RESET} ${NOTE_COLOR}${CONTENT}${COLOR_RESET}"
     done
 }
 
