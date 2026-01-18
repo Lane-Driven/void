@@ -145,7 +145,7 @@ notes_search() {
 
 # Help
 notes_help() {
-    printf "${COLOR_YELLOW}%s${COLOR_RESET}\n" "Usage: notes {add|list|search|help|clear} [args]\n\n"
+    printf "${COLOR_YELLOW}%s${COLOR_RESET}\n\n" "Usage: notes {add|list|search|help|clear} [args]"
 
     printf "${COLOR_YELLOW}Notes prefixes and meaning:${COLOR_RESET}\n"
     printf "${COLOR_RED}!\t${COLOR_WHITE}Urgent / High Priority\n"
