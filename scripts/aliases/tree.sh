@@ -56,31 +56,39 @@ stree_git_check() {
     [ -d "$DIR/.git" ] && echo -e "\033[1;34mGit repository detected in $DIR\033[0m"
 }
 
+# Display a single recent file nicely
+stree_find_recent_files() {
+    local DIR="${1:-.}"
+    local DAYS="${2:-2}"
+    local SHOW_HIDDEN="${3:-false}"
+
+    find "$DIR" -type f -mtime -"$DAYS" \
+        $( [ "$SHOW_HIDDEN" != true ] && echo ! -name ".*" ) \
+        ! -path "*/.git/*" \
+        ! -path "*/node_modules/*" \
+        ! -path "*/dist/*" 2>/dev/null | sort
+}
+
 # List recent files (modified in last N days)
 stree_recent_files() {
     local DIR="${1:-.}"
     local DAYS="${2:-2}"
     local LIMIT=5
-
-    local files=()
-    while IFS= read -r f; do
-        files+=("$f")
-    done < <(find "$DIR" -type f -mtime -"$DAYS" \
-        ! -path "*/.git/*" \
-        ! -path "*/node_modules/*" \
-        ! -path "*/dist/*" 2>/dev/null | sort)
-
-    (( ${#files[@]} == 0 )) && return
+    local SHOW_HIDDEN="${3:-false}"
+    local COUNT=0
 
     echo -e "\033[1;33mRecent files (last $DAYS days):\033[0m"
-    for ((i=0; i<${#files[@]} && i<LIMIT; i++)); do
-        local file_display
-        file_display=$(stree_display_path "${files[i]}")
-        ls -lh --color=auto "${files[i]}" | sed "s|${files[i]}|$file_display|"
+
+    stree_find_recent_files "$DIR" "$DAYS" "$SHOW_HIDDEN" |
+    while IFS= read -r file; do
+        ((COUNT++))
+        if (( COUNT <= LIMIT )); then
+            stree_display_recent_file "$file"
+        fi
     done
 
-    if (( ${#files[@]} > LIMIT )); then
-        echo -e "\033[2m# $(( ${#files[@]} - LIMIT )) more modified files\033[0m"
+    if (( COUNT > LIMIT )); then
+        echo -e "\033[2m# $(( COUNT - LIMIT )) more modified files\033[0m"
     fi
 }
 
@@ -161,7 +169,7 @@ streeh() {
     DEPTH=$(stree_get_depth "$DIR")
     
     stree_git_check "$DIR"
-    stree_recent_files "$DIR"
+    stree_recent_files "$DIR" 2 true
     stree_show_tree "$DIR" "$DEPTH" true  # true = show hidden (excluding .git)
 }
 
