@@ -139,7 +139,7 @@ notes_search() {
             print
         }')
         #HIGHLIGHTED=$(echo "$CONTENT" | perl -pe "s/($QUERY)/\e[1;33m\$1\e[0m/ig")
-        printf "${TS} ${HIGHLIGHTED}${COLOR_RESET}"
+        printf "${TS} ${HIGHLIGHTED}${COLOR_RESET}\n"
     done
 }
 
