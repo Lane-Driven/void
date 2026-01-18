@@ -78,7 +78,7 @@ notes_list() {
 
     # No notes is NOT an error
     if [ "$NOTE_COUNT" -eq 0 ]; then
-        echo "${COLOR_YELLOW}No notes to display.${COLOR_RESET}"
+        printf "${COLOR_YELLOW}%s${COLOR_RESET}\n" "No notes to display."
         return 0
     fi
 
