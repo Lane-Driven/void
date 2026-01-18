@@ -24,7 +24,7 @@ notes_strip_timestamp() {
 }
 
 notes_count_by_prefix() {
-    PREFIX="$1"
+    local PREFIX="$1"
 
     [ -f "$NOTES_FILE" ] || { echo 0; return; }
 
@@ -36,8 +36,8 @@ notes_count_by_prefix() {
         gsub(/^[ \t]+/, "", content)
 
         # Match only if content starts exactly with prefix
-        # Ensure either end of string or next char is not !, ?, +, ~, @, or -
-        if (content ~ "^" prefix "([^!\\?\\+\\~\\@\\-]|$)") count++
+        # Ensure the next character isn’t another prefix char (! ? + ~ @ -)
+        if (content ~ "^" prefix "([^!?+~@-]|$)") count++
     }
     END { print count+0 }' "$NOTES_FILE"
 }
