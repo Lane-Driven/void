@@ -18,6 +18,7 @@ ui_set_prompt() {
         "$COLOR_GREEN" \
         "$USER" \
         "$(hostname)" \
+        "$COLOR_BLUE" \
         "$(basename "$PWD")" \
         "$COLOR_YELLOW" \
         "$(ui_git_branch)" \
