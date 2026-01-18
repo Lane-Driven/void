@@ -50,7 +50,8 @@ notes_list() {
         local TS="${line%%]*}]"
         local CONTENT="${line#*] }"
         local COLOR=$(notes_get_color "$CONTENT")
-        echo -e "${COLOR_TIMESTAMP}${TS}${COLOR_RESET} ${COLOR}${CONTENT}${COLOR_RESET}"
+        echo ${COLOR}
+        echo -e "${COLOR_BLUE}${TS}${COLOR_RESET} ${COLOR}${CONTENT}${COLOR_RESET}"
     done
 }
 
