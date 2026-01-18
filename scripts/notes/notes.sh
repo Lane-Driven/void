@@ -126,8 +126,9 @@ notes_search() {
         printf "${COLOR_YELLOW}Usage: notes search 'keyword'${COLOR_RESET}"
         return 1
     fi
-
-    grep -i --color=always "$QUERY" "$NOTES_FILE" | while IFS= read -r line; do
+    
+    # consider --color=always
+    grep -i "$QUERY" "$NOTES_FILE" | while IFS= read -r line; do
         TS="${line%%]*}]"
         CONTENT="${line#*] }"
         COLOR=$(notes_get_color "$CONTENT")
@@ -138,7 +139,6 @@ notes_search() {
             gsub(q, "\033[1;33m&\033[0m")
             print
         }')
-        #HIGHLIGHTED=$(echo "$CONTENT" | perl -pe "s/($QUERY)/\e[1;33m\$1\e[0m/ig")
         printf "${TS} ${HIGHLIGHTED}${COLOR_RESET}\n"
     done
 }
