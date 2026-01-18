@@ -16,6 +16,8 @@ source "$(dirname "${BASH_SOURCE[0]}")/../colors/colors.sh"
 notes_get_color() {
     local NOTE="$1"
     local PREFIX="${NOTE%% *}"  # take first word for prefix
+    # TODO: Debug
+    echo ${PREFIX}
     case "$PREFIX" in
         "!!") echo "$COLOR_BRIGHT_RED" ;;
         "!")  echo "$COLOR_RED" ;;
@@ -50,6 +52,7 @@ notes_list() {
         local TS="${line%%]*}]"
         local CONTENT="${line#*] }"
         local COLOR=$(notes_get_color "$CONTENT")
+        # TODO: Debug
         echo ${COLOR}
         echo -e "${COLOR_BLUE}${TS}${COLOR_RESET} ${COLOR}${CONTENT}${COLOR_RESET}"
     done
@@ -75,7 +78,7 @@ notes_search() {
         # Highlight search term
         local HIGHLIGHTED
         HIGHLIGHTED=$(echo "$CONTENT" | perl -pe "s/($QUERY)/\e[1;33m\$1\e[0m/ig")
-        echo -e "${COLOR_TIMESTAMP}${TS}${COLOR_RESET} ${COLOR}${HIGHLIGHTED}${COLOR_RESET}"
+        echo -e "${COLOR_BLUE}${TS}${COLOR_RESET} ${COLOR}${HIGHLIGHTED}${COLOR_RESET}"
     done
 }
 
