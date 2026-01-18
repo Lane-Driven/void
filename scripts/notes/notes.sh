@@ -189,6 +189,14 @@ notes() {
     # No arguments: open editor for a new note
     if [ -z "$CMD" ]; then
         printf "${COLOR_YELLOW}%s${COLOR_RESET}\n" "Notes file location: $NOTES_FILE"
+        read -rp "Would you like to create a new note? [y/N] " CONFIRM
+        case "$CONFIRM" in
+            [yY][yY][eE][sS] ;;
+            *)
+                printf "%s" "Usage: notes {add|list|search|help|clear} [args]"
+                return 1
+                ;;
+        esac
         printf "${COLOR_YELLOW}%s${COLOR_RESET}\n" "Opening editor to add a new note..."
 
         # Use $EDITOR or fallback to vi
@@ -234,4 +242,3 @@ notes() {
             ;;
     esac
 }
-
