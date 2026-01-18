@@ -1,0 +1,26 @@
+# Function: update config 
+update_config() {
+    local REPO_DIR="$HOME/Projects/void"
+
+    # Check if directory exists
+    if [ ! -d "$REPO_DIR" ]; then
+        echo "Directory $REPO_DIR does not exist!"
+        return 1
+    fi
+
+    # Change to the repo directory
+    cd "$REPO_DIR" || return 1
+
+    # Pull latest changes from Git
+    echo "Pulling latest changes in $REPO_DIR..."
+    git pull || {
+        echo "Git pull failed!"
+        return 1
+    }
+
+    # Reload Bash shell
+    echo "Reloading Bash..."
+    exec bash
+}
+
+alias git_config='update_config'
