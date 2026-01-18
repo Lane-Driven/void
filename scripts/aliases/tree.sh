@@ -53,11 +53,11 @@ stree_dir_size() {
 
 # Smart tree depth based on top-level item count
 stree_get_depth() {
-    local DIR="$1"
-    local COUNT
+    DIR="$1"
+ 
     COUNT=$(find "$DIR" -mindepth 1 -maxdepth 1 2>/dev/null | wc -l)
 
-    local DEPTH
+    DEPTH=0
     if [ "$COUNT" -gt 50 ]; then
         DEPTH=2
     elif [ "$COUNT" -gt 20 ]; then
@@ -80,9 +80,9 @@ stree_git_check() {
 # Recent files modular functions
 # -----------------------------
 stree_find_recent_files() {
-    local DIR="${1:-.}"
-    local DAYS="${2:-2}"
-    local SHOW_HIDDEN="${3:-false}"
+    DIR="${1:-.}"
+    DAYS="${2:-2}"
+    SHOW_HIDDEN="${3:-false}"
 
     find "$DIR" -type f -mtime -"$DAYS" \
         $( [ "$SHOW_HIDDEN" != true ] && echo ! -name ".*" ) \
@@ -92,40 +92,45 @@ stree_find_recent_files() {
 }
 
 stree_display_recent_file() {
-    local FILE="$1"
-    local DISPLAY SIZE
+    FILE="$1"
+    DISPLAY=''
+    SIZE=''
     DISPLAY=$(stree_display_path "$FILE")
     SIZE=$(stree_dir_size "$FILE")
     printf "[%4s] %s\n" "$SIZE" "$DISPLAY"
 }
 
 stree_recent_files() {
-    local DIR="${1:-.}"
-    local DAYS="${2:-2}"
-    local SHOW_HIDDEN="${3:-false}"
-    local LIMIT=5
-    local COUNT=0
+    DIR="${1:-.}"
+    DAYS="${2:-2}"
+    SHOW_HIDDEN="${3:-false}"
+    LIMIT=5
+    COUNT=0
 
-    echo -e "${COLOR_YELLOW}Recent files (last $DAYS days):${COLOR_RESET}"
+    printf '%b\n' "${COLOR_YELLOW}Recent files (last $DAYS days):${COLOR_RESET}"
 
-    # Use process substitution to avoid subshell issues
-    while IFS= read -r file; do
-        ((COUNT++))
-        ((COUNT <= LIMIT)) && stree_display_recent_file "$file"
-    done < <(stree_find_recent_files "$DIR" "$DAYS" "$SHOW_HIDDEN")
+    stree_find_recent_files "$DIR" "$DAYS" "$SHOW_HIDDEN" | while IFS= read -r file; do
+        COUNT=$((COUNT + 1))
+        if [ "$COUNT" -le "$LIMIT" ]; then
+            stree_display_recent_file "$file"
+        fi
+    done
 
-    (( COUNT > LIMIT )) && echo -e "${COLOR_DIM}# $(( COUNT - LIMIT )) more modified files${COLOR_RESET}"
+    if [ "$COUNT" -gt "$LIMIT" ]; then
+        REMAINING=$((COUNT - LIMIT))
+        printf '%b\n' "${COLOR_DIM}# $REMAINING more modified files${COLOR_RESET}"
+    fi
 }
 
 # -----------------------------
 # Tree options
 # -----------------------------
 stree_tree_opts() {
-    local DEPTH="$1"
-    local SHOW_HIDDEN="$2"
+    DEPTH="$1"
+    SHOW_HIDDEN="$2"
 
     DEPTH=$(( DEPTH < 1 ? 1 : DEPTH ))
-    local OPTS="--dirsfirst --noreport -L $DEPTH"
+    OPTS="--dirsfirst --noreport -L $DEPTH"
 
     [ "$SHOW_HIDDEN" = true ] && OPTS="$OPTS -a"
 
@@ -137,11 +142,10 @@ stree_tree_opts() {
 
 # Display the tree itself
 stree_show_tree() {
-    local DIR="$1"
-    local DEPTH="$2"
-    local SHOW_HIDDEN="$3"
+    DIR="$1"
+    DEPTH="$2"
+    SHOW_HIDDEN="$3"
 
-    local TREE_OPTS
     TREE_OPTS=$(stree_tree_opts "$DEPTH" "$SHOW_HIDDEN")
 
     tree -C $TREE_OPTS "$DIR" | while IFS= read -r line; do
@@ -165,13 +169,12 @@ stree_show_tree() {
 # Main super tree functions
 # -----------------------------
 stree() {
-    local DIR="${1:-.}"
-    local SHOW_HIDDEN=false
-    local DEPTH
+    DIR="."
+    SHOW_HIDDEN="false"
 
     # Check for -a option
-    if [[ "$1" == "-a" ]]; then
-        SHOW_HIDDEN=true
+    if [ "$1" = "-a" ]; then
+        SHOW_HIDDEN="true"
         DIR="${2:-.}"
         shift 2
     fi
@@ -183,12 +186,11 @@ stree() {
 }
 
 streeh() {
-    local DIR="${1:-.}"
-    local DEPTH
+    DIR="${1:-.}"
     DEPTH=$(stree_get_depth "$DIR")
 
     stree_git_check "$DIR"
-    stree_recent_files "$DIR" 2 true     # always show hidden
-    stree_show_tree "$DIR" "$DEPTH" true # always show hidden, .git ignored
+    stree_recent_files "$DIR" 2 "true"     # always show hidden
+    stree_show_tree "$DIR" "$DEPTH" "true" # always show hidden, .git ignored
 }
 
