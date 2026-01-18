@@ -33,17 +33,6 @@ stree_dir_display() {
 }
 
 # Centralized size calculation for files and directories
-stree_dir_size_test() {
-    local PATH="$1"
-    echo "DEBUG: Checking path: $PATH" >&2
-    echo "DEBUG: PATH is $PATH" >&2
-    if [ -e "$PATH" ]; then
-        /usr/bin/du -sh "$PATH" 2>/dev/null | /usr/bin/cut -f1
-    else
-        echo "?"
-    fi
-}
-
 stree_dir_size() {
     local PATH_TO_CHECK="$1"
     if [ -e "$PATH_TO_CHECK" ]; then
