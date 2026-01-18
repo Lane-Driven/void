@@ -20,14 +20,14 @@ notes_count() {
 }
 
 notes_count_by_prefix() {
-    local PREFIX="$1"
+    PREFIX="$1"
     [[ -f "$NOTES_FILE" ]] || { echo 0; return; }
     grep -c "${GREP_PREFIXES} ${PREFIX}" "$NOTES_FILE"
 }
 
 # Map prefixes to colors
 notes_get_color() {
-    local NOTE="$1"
+    NOTE="$1"
 
     case "$NOTE" in
         "!!"*) echo "$COLOR_BRIGHT_RED" ;;
