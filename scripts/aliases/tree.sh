@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 # -----------------------------
 # Modular Super Tree Function
 # -----------------------------
@@ -30,7 +30,11 @@ stree_dir_display() {
     SIZE='?'
 
     if [ -e "$FULLPATH" ]; then
-        SIZE=$(du -s "$FULLPATH" 2>/dev/null | awk '{print $1}')
+        if du -h . >/dev/null 2>&1; then
+            SIZE=$(du -sh "$FULLPATH" 2>/dev/null | awk '{print $1}')
+        else
+            SIZE=$(du -s "$FULLPATH" 2>/dev/null | awk '{print $1}')
+        fi
     fi
 
     printf "%s[%4s] %s/\n" "$INDENT" "$SIZE" "$NAME"
@@ -38,13 +42,12 @@ stree_dir_display() {
 
 # Centralized size calculation for files and directories
 stree_dir_size() {
-    PATH_TO_CHECK="$1"
-    if [ -e "$PATH_TO_CHECK" ]; then
-        size=$(/usr/bin/du -sh "$PATH_TO_CHECK" 2>/dev/null)
-        # du outputs like "4.0K   ./file"
-        echo "${size%%[[:space:]]*}"  # strip everything after the first whitespace
+    path=$1
+
+    if [ -f "$path" ] || [ -d "$path" ]; then
+        du "$path" 2>/dev/null | awk '{ print $1 }'
     else
-        echo "?"
+        printf "%s\n" "?"
     fi
 }
 
