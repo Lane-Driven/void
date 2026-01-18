@@ -76,7 +76,7 @@ notes_search() {
         # Highlight search term
         local HIGHLIGHTED
         HIGHLIGHTED=$(echo "$CONTENT" | perl -pe "s/($QUERY)/\e[1;33m\$1\e[0m/ig")
-        echo -e "${COLOR_BLUE}${TS}${COLOR_RESET} ${COLOR}${HIGHLIGHTED}${COLOR_RESET}"
+        echo -e "${TS} ${HIGHLIGHTED}${COLOR_RESET}"
     done
 }
 
