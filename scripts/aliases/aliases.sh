@@ -43,3 +43,4 @@ git_help() {
     echo "Tip: You can add more aliases or explore 'git help -a' for all available commands."
 }
 
+alias git_help="git_help"

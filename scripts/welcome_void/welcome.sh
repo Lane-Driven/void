@@ -1,34 +1,59 @@
+# -----------------------------
 # ~/.bashrc additions for a colorful welcome
+# -----------------------------
 
+# Function to get last update time
 LAST_UPDATE() {
     local LOGFILE="/var/log/void_update.log"
 
+    # If log file doesn't exist
     [ -f "$LOGFILE" ] || { echo "Never"; return; }
 
     local last_epoch
     last_epoch=$(date -d "$(cat "$LOGFILE")" +%s)
-
     local now_epoch
     now_epoch=$(date +%s)
-
     local diff=$(( now_epoch - last_epoch ))
 
-    if [ $diff -lt 60 ]; then
+    if (( diff < 60 )); then
         echo "< 1 min"
-    elif [ $diff -lt 3600 ]; then
+    elif (( diff < 3600 )); then
         echo "< 1 hour"
-    elif [ $diff -lt 86400 ]; then
+    elif (( diff < 86400 )); then
         echo "< 1 day"
-    elif [ $diff -lt 604800 ]; then
-        echo "$((diff / 86400)) days ago"
+    elif (( diff < 604800 )); then
+        echo "$(( diff / 86400 )) days ago"
     else
-        echo "$((diff / 604800)) weeks ago"
+        echo "$(( diff / 604800 )) weeks ago"
     fi
 }
 
-welcome_void() {
-    local LAST_UPDATE_OUT=$(LAST_UPDATE)
+# Function to prompt for update if more than 3 days
+prompt_update() {
+    local LOGFILE="/var/log/void_update.log"
 
+    # If log doesn't exist, suggest update
+    if [ ! -f "$LOGFILE" ]; then
+        echo -e "\033[1;33mIt looks like you haven't updated yet. Run \`update_void\` to update!\033[0m"
+        return
+    fi
+
+    local last_epoch
+    last_epoch=$(date -d "$(cat "$LOGFILE")" +%s)
+    local now_epoch
+    now_epoch=$(date +%s)
+    local diff=$(( now_epoch - last_epoch ))
+
+    # Threshold: 3 days = 259200 seconds
+    if (( diff > 259200 )); then
+        echo -e "\033[1;33mIt's been more than 3 days since the last update. Consider running \`update_void\`!\033[0m"
+    fi
+}
+
+# Welcome function
+welcome_void() {
+    local LAST_UPDATE_OUT
+    LAST_UPDATE_OUT=$(LAST_UPDATE)
 
     # Colors
     local RED="\033[0;31m"
@@ -40,13 +65,16 @@ welcome_void() {
     local RESET="\033[0m"
 
     # Read OS info
-    local NAME=$(grep ^PRETTY_NAME= /etc/os-release | cut -d= -f2 | tr -d '"')
-    local ID=$(grep ^ID= /etc/os-release | cut -d= -f2 | tr -d '"')
+    local NAME
+    NAME=$(grep ^PRETTY_NAME= /etc/os-release | cut -d= -f2 | tr -d '"')
+    local ID
+    ID=$(grep ^ID= /etc/os-release | cut -d= -f2 | tr -d '"')
 
     # System info
-    local KERNEL=$(uname -r)
-    local ARCH=$(uname -m)
-    local UPTIME=$(uptime -p)
+    local KERNEL ARCH UPTIME
+    KERNEL=$(uname -r)
+    ARCH=$(uname -m)
+    UPTIME=$(uptime -p)
 
     echo -e "${CYAN}=====================================${RESET}"
     echo -e "${GREEN}Welcome, ${YELLOW}$USER${GREEN}!"
@@ -56,8 +84,11 @@ welcome_void() {
     echo -e "${MAGENTA}Uptime: ${CYAN}$UPTIME"
     echo -e "${MAGENTA}Current directory: ${CYAN}$PWD"
     echo -e "${CYAN}=====================================${RESET}"
+
+    # Check for update
+    prompt_update
 }
 
-# Call it automatically on login
+# Automatically call on login
 welcome_void
 
