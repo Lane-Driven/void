@@ -192,7 +192,7 @@ notes() {
         printf "%s%s%s\n" "$COLOR_YELLOW" "Opening editor to add a new note..." "$COLOR_RESET"
 
         # Use $EDITOR or fallback to vi
-        EDITOR_CMD="${EDITOR:-vi}"
+        EDITOR_CMD="${EDITOR:-vim}"
 
         # Temporary file
         TMPFILE="/tmp/notes.$$"
