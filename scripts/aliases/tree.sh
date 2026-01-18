@@ -32,6 +32,12 @@ stree_dir_display() {
     printf "%s[%4s] %s/\n" "$INDENT" "$SIZE" "$NAME"
 }
 
+# Centralized size calculation for files and directories
+stree_dir_size() {
+    local PATH="$1"
+    [ -e "$PATH" ] && du -sh "$PATH" 2>/dev/null | cut -f1 || echo "?"
+}
+
 # Smart tree depth based on top-level item count
 stree_get_depth() {
     local DIR="$1"
@@ -50,13 +56,16 @@ stree_get_depth() {
     # Ensure minimum depth is 1
     echo $(( DEPTH < 1 ? 1 : DEPTH ))
 }
+
 # Detect Git repository
 stree_git_check() {
     local DIR="$1"
     [ -d "$DIR/.git" ] && echo -e "\033[1;34mGit repository detected in $DIR\033[0m"
 }
 
-# Display a single recent file nicely
+# -----------------------------
+# Recent files modular functions
+# -----------------------------
 stree_find_recent_files() {
     local DIR="${1:-.}"
     local DAYS="${2:-2}"
@@ -69,40 +78,42 @@ stree_find_recent_files() {
         ! -path "*/dist/*" 2>/dev/null | sort
 }
 
-# List recent files (modified in last N days)
+stree_display_recent_file() {
+    local FILE="$1"
+    local DISPLAY SIZE
+    DISPLAY=$(stree_display_path "$FILE")
+    SIZE=$(stree_dir_size "$FILE")
+    printf "[%4s] %s\n" "$SIZE" "$DISPLAY"
+}
+
 stree_recent_files() {
     local DIR="${1:-.}"
     local DAYS="${2:-2}"
-    local LIMIT=5
     local SHOW_HIDDEN="${3:-false}"
+    local LIMIT=5
     local COUNT=0
 
     echo -e "\033[1;33mRecent files (last $DAYS days):\033[0m"
 
-    stree_find_recent_files "$DIR" "$DAYS" "$SHOW_HIDDEN" |
+    # Use process substitution to avoid subshell issues
     while IFS= read -r file; do
         ((COUNT++))
-        if (( COUNT <= LIMIT )); then
-            stree_display_recent_file "$file"
-        fi
-    done
+        ((COUNT <= LIMIT)) && stree_display_recent_file "$file"
+    done < <(stree_find_recent_files "$DIR" "$DAYS" "$SHOW_HIDDEN")
 
-    if (( COUNT > LIMIT )); then
-        echo -e "\033[2m# $(( COUNT - LIMIT )) more modified files\033[0m"
-    fi
+    (( COUNT > LIMIT )) && echo -e "\033[2m# $(( COUNT - LIMIT )) more modified files\033[0m"
 }
 
-# Get tree options safely
+# -----------------------------
+# Tree options
+# -----------------------------
 stree_tree_opts() {
     local DEPTH="$1"
     local SHOW_HIDDEN="$2"
 
-    # Ensure minimum depth of 1
     DEPTH=$(( DEPTH < 1 ? 1 : DEPTH ))
-
     local OPTS="--dirsfirst --noreport -L $DEPTH"
 
-    # Show hidden files if requested
     [ "$SHOW_HIDDEN" = true ] && OPTS="$OPTS -a"
 
     # Always ignore .git
@@ -125,7 +136,7 @@ stree_show_tree() {
             local prefix="${BASH_REMATCH[1]}"
             local name="${BASH_REMATCH[2]}"
             local size
-            size=$(stree_dir_size "$DIR/$name")   # centralized size calculation
+            size=$(stree_dir_size "$DIR/$name")
             local display
             display=$(stree_display_path "$DIR/$name")
             printf "%s[%4s] %s/\n" "$prefix" "$size" "$display"
@@ -154,22 +165,17 @@ stree() {
 
     DEPTH=$(stree_get_depth "$DIR")
     stree_git_check "$DIR"
-    stree_recent_files "$DIR"
-
-    if [ "$SHOW_HIDDEN" = true ]; then
-        stree_show_tree "$DIR" "-a" "-L" "$DEPTH" "$@"
-    else
-        stree_show_tree "$DIR" "-L" "$DEPTH" "$@"
-    fi
+    stree_recent_files "$DIR" 2 "$SHOW_HIDDEN"
+    stree_show_tree "$DIR" "$DEPTH" "$SHOW_HIDDEN"
 }
 
 streeh() {
     local DIR="${1:-.}"
     local DEPTH
     DEPTH=$(stree_get_depth "$DIR")
-    
+
     stree_git_check "$DIR"
-    stree_recent_files "$DIR" 2 true
-    stree_show_tree "$DIR" "$DEPTH" true  # true = show hidden (excluding .git)
+    stree_recent_files "$DIR" 2 true     # always show hidden
+    stree_show_tree "$DIR" "$DEPTH" true # always show hidden, .git ignored
 }
 
