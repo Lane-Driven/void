@@ -26,19 +26,21 @@ notes_strip_timestamp() {
 notes_count_by_prefix() {
     PREFIX="$1"
 
-    # Return 0 if notes file doesn't exist
     [ -f "$NOTES_FILE" ] || { echo 0; return 0; }
 
-    # Count lines where the content (after timestamp) starts with the prefix
     awk -v prefix="$PREFIX" '
     {
-        # Remove the timestamp in brackets and the following space
         content = $0
+        # Strip timestamp
         sub(/^\[[^]]*\] /, "", content)
 
-        # Check if the note starts with the given prefix
-        if (index(content, prefix) == 1) {
-            count++
+        # Match exact prefix
+        if (prefix ~ /^!$/) {
+            # Single ! must not be followed by another !
+            if (content ~ /^![^!]/ || content == "!") count++
+        } else {
+            # Multi-char prefix must match exactly
+            if (content ~ "^" prefix) count++
         }
     }
     END { print count + 0 }' "$NOTES_FILE"
