@@ -26,23 +26,21 @@ notes_strip_timestamp() {
 notes_count_by_prefix() {
     PREFIX="$1"
 
-    # If notes file doesn't exist, return 0
     [ -f "$NOTES_FILE" ] || { echo 0; return; }
 
-    # Use awk to count lines where the note content starts exactly with the prefix
     awk -v prefix="$PREFIX" '
     {
-        # Extract content after the timestamp (anything after "] ")
+        # Extract content after the timestamp
         match($0, /\] (.*)/, arr)
         content = arr[1]
-        # Strip leading spaces
         gsub(/^[ \t]+/, "", content)
-        # Increment count if it starts exactly with the prefix
-        if (content ~ "^" prefix) count++
+
+        # Match only if content starts exactly with prefix
+        # Ensure either end of string or next char is not !, ?, +, ~, @, or -
+        if (content ~ "^" prefix "([^!\\?\\+\\~\\@\\-]|$)") count++
     }
     END { print count+0 }' "$NOTES_FILE"
 }
-
 
 # Map prefixes to colors
 notes_get_color() {
