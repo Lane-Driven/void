@@ -36,16 +36,20 @@ stree_dir_display() {
 stree_get_depth() {
     local DIR="$1"
     local COUNT
-    COUNT=$(find "$DIR" -mindepth 1 -maxdepth 1 | wc -l)
-    if [ "$COUNT" -gt 50 ]; then
-        echo 2
-    elif [ "$COUNT" -gt 20 ]; then
-        echo 3
-    else
-        echo 4
-    fi
-}
+    COUNT=$(find "$DIR" -mindepth 1 -maxdepth 1 2>/dev/null | wc -l)
 
+    local DEPTH
+    if [ "$COUNT" -gt 50 ]; then
+        DEPTH=2
+    elif [ "$COUNT" -gt 20 ]; then
+        DEPTH=3
+    else
+        DEPTH=4
+    fi
+
+    # Ensure minimum depth is 1
+    echo $(( DEPTH < 1 ? 1 : DEPTH ))
+}
 # Detect Git repository
 stree_git_check() {
     local DIR="$1"
