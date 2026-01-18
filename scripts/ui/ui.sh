@@ -1,7 +1,7 @@
 #!/bin/sh
 # source "$(dirname "${BASH_SOURCE[0]}")/../colors/colors.sh"
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
-. "SCRIPT_DIR/../colors/colors.sh"
+. "SCRIPT_DIR/colors/colors.sh"
 printf "DEGUB: ${SCRIPT_DIR}\n"
 
 ui_git_branch() {
