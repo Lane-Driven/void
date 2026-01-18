@@ -15,14 +15,33 @@ touch "$NOTES_FILE"
 source "$(dirname "${BASH_SOURCE[0]}")/../colors/colors.sh"
 
 notes_count() {
-    [[ -f "$NOTES_FILE" ]] || { echo 0; return; }
+    [ -f "$NOTES_FILE" ] || { echo 0; return; }
     grep -c . "$NOTES_FILE"
+}
+
+notes_strip_timestamp() {
+    awk '{ sub(/^\[[^}}*\] /, ""); print }'
 }
 
 notes_count_by_prefix() {
     PREFIX="$1"
-    [[ -f "$NOTES_FILE" ]] || { echo 0; return; }
-    grep -c "${GREP_PREFIXES} ${PREFIX}" "$NOTES_FILE"
+
+    # Return 0 if notes file doesn't exist
+    [ -f "$NOTES_FILE" ] || { echo 0; return 0; }
+
+    # Count lines where the content (after timestamp) starts with the prefix
+    awk -v prefix="$PREFIX" '
+    {
+        # Remove the timestamp in brackets and the following space
+        content = $0
+        sub(/^\[[^]]*\] /, "", content)
+
+        # Check if the note starts with the given prefix
+        if (index(content, prefix) == 1) {
+            count++
+        }
+    }
+    END { print count + 0 }' "$NOTES_FILE"
 }
 
 # Map prefixes to colors
