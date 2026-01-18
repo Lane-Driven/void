@@ -26,25 +26,23 @@ notes_strip_timestamp() {
 notes_count_by_prefix() {
     PREFIX="$1"
 
-    [ -f "$NOTES_FILE" ] || { echo 0; return 0; }
+    # If notes file doesn't exist, return 0
+    [ -f "$NOTES_FILE" ] || { echo 0; return; }
 
+    # Use awk to count lines where the note content starts exactly with the prefix
     awk -v prefix="$PREFIX" '
     {
-        content = $0
-        # strip timestamp
-        sub(/^\[[^]]*\] /, "", content)
-
-        # Exact matching logic
-        if (prefix == "!") {
-            # Only single !, not followed by another ! or ? or + or ~ or -
-            if (content ~ /^![^!?\+~-]/ || content == "!") count++
-        } else {
-            # Multi-character prefix must match exactly at start
-            if (content ~ "^" prefix) count++
-        }
+        # Extract content after the timestamp (anything after "] ")
+        match($0, /\] (.*)/, arr)
+        content = arr[1]
+        # Strip leading spaces
+        gsub(/^[ \t]+/, "", content)
+        # Increment count if it starts exactly with the prefix
+        if (content ~ "^" prefix) count++
     }
     END { print count+0 }' "$NOTES_FILE"
 }
+
 
 # Map prefixes to colors
 notes_get_color() {
@@ -64,8 +62,8 @@ notes_get_color() {
 
 # Add a new note
 notes_add() {
-    local NOTE="$*"
-    if [[ -z "$NOTE" ]]; then
+    NOTE="$*"
+    if [ -z "$NOTE" ]; then
         echo -e "${COLOR_YELLOW}Usage: notes add \"Your note here\"${COLOR_RESET}"
         return 1
     fi
