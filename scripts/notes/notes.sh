@@ -60,13 +60,13 @@ notes_get_color() {
 notes_add() {
     NOTE="$*"
     if [ -z "$NOTE" ]; then
-        echo -e "${COLOR_YELLOW}Usage: notes add \"Your note here\"${COLOR_RESET}"
+        printf "${COLOR_YELLOW}Usage: notes add 'Your note here'${COLOR_RESET}\n"
         return 1
     fi
     local TIMESTAMP
     TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S")
     echo "[$TIMESTAMP] $NOTE" >> "$NOTES_FILE"
-    echo -e "${COLOR_YELLOW}Note added!${COLOR_RESET}"
+    printf "${COLOR_YELLOW}Note added!${COLOR_RESET}\n"
 }
 
 # List notes
@@ -84,12 +84,12 @@ notes_list() {
 
     # Invalid count cases ARE errors
     if [ "$COUNT" -eq 0 ]; then
-        echo "${COLOR_YELLOW}Count must be at least 1.${COLOR_RESET}"
+        echo "${COLOR_YELLOW}Count must be at least 1.${COLOR_RESET}\n"
         return 1
     fi
 
     if [ "$COUNT" -lt 0 ]; then
-        echo "${COLOR_YELLOW}Count cannot be negative.${COLOR_RESET}"
+        printf "${COLOR_YELLOW}Count cannot be negative.${COLOR_RESET}\n"
         return 1
     fi
 
@@ -100,7 +100,7 @@ notes_list() {
 
     # Optional header (useful for welcome screen)
     if [ "$SHOW_HEADER" = true ]; then
-        echo -e "${COLOR_YELLOW}Last $COUNT notes:${COLOR_RESET}"
+        printf "${COLOR_YELLOW}Last $COUNT notes:${COLOR_RESET}\n"
     fi
 
     tail -n "$COUNT" "$NOTES_FILE" | while IFS= read -r line; do
@@ -108,7 +108,7 @@ notes_list() {
         CONTENT="${line#*] }"
         COLOR=$(notes_get_color "$CONTENT")
 
-        echo -e "${COLOR_BLUE}${TS}${COLOR_RESET} ${COLOR}${CONTENT}${COLOR_RESET}"
+        printf "${COLOR_BLUE}${TS}${COLOR_RESET} ${COLOR}${CONTENT}${COLOR_RESET}\n"
     done
 
     return 0
@@ -121,33 +121,35 @@ notes_list_last() {
 
 # Search notes
 notes_search() {
-    local QUERY="$*"
-    if [[ -z "$QUERY" ]]; then
-        echo -e "${COLOR_YELLOW}Usage: notes search \"keyword\"${COLOR_RESET}"
+    QUERY="$*"
+    if [ -z "$QUERY" ]; then
+        printf "${COLOR_YELLOW}Usage: notes search 'keyword'${COLOR_RESET}"
         return 1
     fi
 
     grep -i --color=always "$QUERY" "$NOTES_FILE" | while IFS= read -r line; do
-        local TS="${line%%]*}]"
-        local CONTENT="${line#*] }"
-        local COLOR=$(notes_get_color "$CONTENT")
+        TS="${line%%]*}]"
+        CONTENT="${line#*] }"
+        COLOR=$(notes_get_color "$CONTENT")
         # Highlight search term
-        local HIGHLIGHTED
+        HIGHLIGHTED
         HIGHLIGHTED=$(echo "$CONTENT" | perl -pe "s/($QUERY)/\e[1;33m\$1\e[0m/ig")
-        echo -e "${TS} ${HIGHLIGHTED}${COLOR_RESET}"
+        printf "${TS} ${HIGHLIGHTED}${COLOR_RESET}"
     done
 }
 
 # Help
 notes_help() {
-    printf "${COLOR_YELLOW}Notes prefixes and meaning:${COLOR_RESET}"
-    printf "${COLOR_RED}!\t${COLOR_WHITE}Urgent / High Priority"
-    printf "${COLOR_BRIGHT_RED}!!\t${COLOR_WHITE}Critical / Immediate Action"
-    printf "${COLOR_YELLOW}!?\t${COLOR_WHITE}Question / Follow-up needed"
-    printf "${COLOR_CYAN}!@\t${COLOR_WHITE}Reminder / Scheduled task"
-    echo -e "${COLOR_GREEN}!+\t${COLOR_WHITE}Idea / Enhancement"
-    echo -e "${COLOR_MAGENTA}!- \t${COLOR_WHITE}Bug / Issue"
-    echo -e "${COLOR_BLUE}!~\t${COLOR_WHITE}WIP / Work in progress"
+    printf "${COLOR_YELLOW}%s${COLOR_RESET}\n" "Usage: notes {add|list|search|help|clear} [args]\n\n"
+
+    printf "${COLOR_YELLOW}Notes prefixes and meaning:${COLOR_RESET}\n"
+    printf "${COLOR_RED}!\t${COLOR_WHITE}Urgent / High Priority\n"
+    printf "${COLOR_BRIGHT_RED}!!\t${COLOR_WHITE}Critical / Immediate Action\n"
+    printf "${COLOR_YELLOW}!?\t${COLOR_WHITE}Question / Follow-up needed\n"
+    printf "${COLOR_CYAN}!@\t${COLOR_WHITE}Reminder / Scheduled task\n"
+    printf "${COLOR_GREEN}!+\t${COLOR_WHITE}Idea / Enhancement\n"
+    printf "${COLOR_MAGENTA}!- \t${COLOR_WHITE}Bug / Issue\n"
+    printf "${COLOR_BLUE}!~\t${COLOR_WHITE}WIP / Work in progress\n"
 }
 
 # Clear all notes, optionally with force
@@ -166,7 +168,8 @@ notes_clear() {
 
     if [ "$FORCE" = false ]; then
         # Confirm with the user
-        read -rp "Are you sure you want to delete ALL notes? [y/N] " CONFIRM
+        printf "Are you sure you want to delete ALL notes? [y/N] "
+        read -r CONFIRM
         case "$CONFIRM" in
             [yY]|[yY][eE][sS]) ;;
             *) 
@@ -189,7 +192,8 @@ notes() {
     # No arguments: open editor for a new note
     if [ -z "$CMD" ]; then
         printf "${COLOR_YELLOW}%s${COLOR_RESET}\n" "Notes file location: $NOTES_FILE"
-        read -rp "Would you like to create a new note? [y/N] " CONFIRM
+        printf "Would you like to create a new note? [y/N] "
+        read -r CONFIRM
         case "$CONFIRM" in
             [yY]*) 
                 ;;
@@ -241,7 +245,7 @@ notes() {
             notes_clear "$@"
             ;;
         *)
-            printf "${COLOR_YELLOW}%s${COLOR_RESET}\n" "Usage: notes {add|list|search|help|clear} [args]"
+            notes_help
             ;;
     esac
 }

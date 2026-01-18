@@ -3,6 +3,7 @@
 # Shared terminal colors
 # -----------------------------
 
+# ECHO Colors
 COLOR_RESET="\033[0m"
 
 COLOR_BOLD="\033[1m"
@@ -17,3 +18,4 @@ COLOR_RED="\033[1;31m"
 COLOR_BRIGHT_RED="\033[1;91m"
 COLOR_WHITE="\033[1;37m"
 
+# POSIX Colors
