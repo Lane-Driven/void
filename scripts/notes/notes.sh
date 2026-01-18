@@ -54,7 +54,7 @@ notes_search() {
         # Highlight the search term
         local HIGHLIGHTED_CONTENT
         HIGHLIGHTED_CONTENT=$(echo "$CONTENT" | sed "s/$QUERY/${COLOR_HIGHLIGHT}&${COLOR_NOTE}/Ig")
-        echo -e "${COLOR_TIMESTAMP}${TS}${COLOR_RESET} ${COLOR_NOTE}${HIGHLIGHTED_CONTENT}${COLOR_RESET}"
+        echo -e "${COLOR_TIMESTAMP}${TS}${COLOR_RESET} ${COLOR_NOTE}   ${HIGHLIGHTED_CONTENT}   ${COLOR_RESET}"
     done
 }
 
