@@ -188,8 +188,8 @@ notes() {
 
     # No arguments: open editor for a new note
     if [ -z "$CMD" ]; then
-        printf "%s%s%s\n" "$COLOR_YELLOW" "Notes file location: $NOTES_FILE" "$COLOR_RESET"
-        printf "%s%s%s\n" "$COLOR_YELLOW" "Opening editor to add a new note..." "$COLOR_RESET"
+        printf "${COLOR_YELLOW}%s${COLOR_RESET}\n" "Notes file location: $NOTES_FILE"
+        printf "${COLOR_YELLOW}%s${COLOR_RESET}\n" "Opening editor to add a new note..."
 
         # Use $EDITOR or fallback to vi
         EDITOR_CMD="${EDITOR:-vim}"
@@ -205,7 +205,7 @@ notes() {
             NOTE=$(cat "$TMPFILE")
             notes_add "$NOTE"
         else
-            printf "%s%s%s\n" "$COLOR_YELLOW" "No note added." "$COLOR_RESET"
+            printf "${COLOR_YELLOW}%s${COLOR_RESET}\n" "No note added."
         fi
 
         # Clean up
@@ -230,7 +230,7 @@ notes() {
             notes_clear "$@"
             ;;
         *)
-            printf "%s%s%s\n" "$COLOR_YELLOW" "Usage: notes {add|list|search|help|clear} [args]" "$COLOR_RESET"
+            printf "${COLOR_YELLOW}%s${COLOR_RESET}\n" "Usage: notes {add|list|search|help|clear} [args]"
             ;;
     esac
 }
