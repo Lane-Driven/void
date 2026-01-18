@@ -12,9 +12,24 @@ stree_display_path() {
     fi
 }
 
-# Get directory size in human-readable format
-stree_dir_size() {
-    du -sh "$1" 2>/dev/null | cut -f1
+# -----------------------------
+# Display a single directory with size
+# -----------------------------
+stree_dir_display() {
+    local PARENT="$1"
+    local NAME="$2"   # directory name
+    local INDENT="$3" # leading spaces for tree alignment
+
+    local FULLPATH="$PARENT/$NAME"
+    local SIZE
+
+    if [ -e "$FULLPATH" ]; then
+        SIZE=$(du -sh "$FULLPATH" 2>/dev/null | cut -f1)
+    else
+        SIZE="?"
+    fi
+
+    printf "%s[%4s] %s/\n" "$INDENT" "$SIZE" "$NAME"
 }
 
 # Smart tree depth based on top-level item count
@@ -68,25 +83,18 @@ stree_recent_files() {
 # Display the tree itself, now accepting extra tree options
 stree_show_tree() {
     local DIR="$1"
-    shift
-    local TREE_OPTS=("$@")   # All remaining args are tree flags
+    local DEPTH="$2"
+    local SHOW_HIDDEN="$3"
 
-    # Always dirs first, no report
-    TREE_OPTS=("--dirsfirst" "--noreport" "${TREE_OPTS[@]}")
+    local TREE_OPTS="--dirsfirst --noreport -L $DEPTH"
+    [ "$SHOW_HIDDEN" = true ] && TREE_OPTS="$TREE_OPTS -a"
 
-    # Run tree with colors and options
-    tree -C "${TREE_OPTS[@]}" "$DIR" | while IFS= read -r line; do
-        # Check for directory lines like [size] name/
-        if [[ "$line" =~ ^(\[.*\][[:space:]]+)(.+)/$ ]]; then
-            local prefix="${BASH_REMATCH[1]}"
-            local name="${BASH_REMATCH[2]}"
-            local size
-            size=$(du -sh "$DIR/$name" 2>/dev/null | cut -f1)
-            local display
-            display=$(stree_display_path "$DIR/$name")
-            printf "%s[%4s] %s/\n" "$prefix" "$size" "$display"
-        elif [[ -f "$line" ]]; then
-            ls -lh --color=auto "$line"
+    tree -C $TREE_OPTS "$DIR" | while IFS= read -r line; do
+        # Match directories only
+        if [[ "$line" =~ ^([[:space:]]*)([^/]+/) ]]; then
+            local indent="${BASH_REMATCH[1]}"
+            local name="${BASH_REMATCH[2]%/}"  # remove trailing slash
+            stree_dir_display "$DIR" "$name" "$indent"
         else
             echo "$line"
         fi
