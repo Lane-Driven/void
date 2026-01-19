@@ -1,9 +1,5 @@
-#!/usr/bin/env bash
-# Void update utilities
-# -----------------------------
-source "$(dirname "${BASH_SOURCE[0]}")/../colors/01_colors.sh"
 
-source "$(dirname "${BASH_SOURCE[0]}")/../notes/notes.sh"
+echo "DEV: env/04_welcome.sh"
 
 # -----------------------------
 # Show recent notes on welcome

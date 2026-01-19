@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
+
+echo "DEV: update_vim/update_vim.sh"
 
 update_vimrc() {
     cd ~/Projects/void || return

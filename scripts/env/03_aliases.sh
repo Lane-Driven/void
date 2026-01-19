@@ -1,4 +1,6 @@
-#!/usr/bin/env bash
+
+echo "DEV: env/aliases.sh"
+
 alias update="update_void"
 # IMPORTANT
 alias install="sudo xbps-install -y"

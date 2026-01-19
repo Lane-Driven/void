@@ -1,4 +1,6 @@
-#!/usr/bin/env bash
+
+echo "DEV: notes/notes.sh"
+
 # -----------------------------
 # Colorized Terminal Notes
 # -----------------------------
