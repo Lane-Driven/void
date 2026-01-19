@@ -6,10 +6,10 @@ source_scripts_dir() {
 
     [ -d "$SCRIPTS_DIR" ] && \
     while IFS= read -r f; do
+        [ -f "$f" ] && echo && source "$f"
         ((scripts_count++))  # NOT POSIX  use 'scripts_count=$((scripts_count+1))
     done < <(find "$SCRIPTS_DIR" -type f -name "*.sh" | sort)
-    echo "Scripts cout = $scripts_count"
-    echo "COLOR_RESET = $COLOR_RESET"
+    echo "${COLOR_YELLOW}Scripts loaded: ${scripts_count}"
 }
 
 source_scripts_dir
