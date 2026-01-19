@@ -11,8 +11,8 @@ ui_git_branch() {
 ui_set_prompt() {
     PS1=$(printf '%s[%s%s%s@%s%s%s %s\W%s%s%s] \$ ' \
         "$COLOR_RESET" \
-        "$COLOR_GREEN" "$USER" "$COLOR_RESET" \
-        "$COLOR_MAGENTA" "$HOSTNAME" "$COLOR_RESET" \
+        "$COLOR_GREEN" "$USER" \
+        "$COLOR_MAGENTA" "$HOSTNAME" \
         "$COLOR_BLUE" \
         "$COLOR_YELLOW" \
         '$(ui_git_branch)' \
