@@ -8,9 +8,9 @@ source_scripts_dir() {
 
     [ -d "$SCRIPTS_DIR" ] && \
     while IFS= read -r f; do
-        [ -f "$f" ] && echo "Sourcing: $f" && source "$f"
         ((scripts_count++))  # NOT POSIX  use 'scripts_count=$((scripts_count+1))
     done < <(find "$SCRIPTS_DIR" -type f -name "*.sh" | sort)
+    printf '%s%s %s%s' "\033[33m" "Scripts loaded: " "$scripts_count." "\033[0m\n"
 }
 
 source_scripts_dir
