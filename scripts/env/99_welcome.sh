@@ -7,8 +7,7 @@ echo "DEV: env/99_welcome.sh (loads last)"
 welcome_recent_notes() {
     local COUNT=5   # Number of notes to display
 
-    echo
-    echo -e "${COLOR_CYAN}Recent notes:${COLOR_RESET}"
+    echo -e "${COLOR_YELLOW}Recent notes:${COLOR_RESET}"
     notes_list_last $COUNT  # ../notes/notes.sh
 }
 
