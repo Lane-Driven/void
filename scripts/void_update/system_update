@@ -1,4 +1,5 @@
-!#/usr/bin/env bash
+#!/usr/bin/env bash
+
 echo "DEV: xbps-install -Su (system update)... /var/log/void_update.log"
 
 update_void() {
