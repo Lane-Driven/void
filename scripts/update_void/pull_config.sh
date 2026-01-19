@@ -23,4 +23,4 @@ update_config() {
     exec bash
 }
 
-alias git_config='update_config'
+alias git_config=$(update_config)

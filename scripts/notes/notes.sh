@@ -9,9 +9,6 @@ NOTES_FILE="$NOTES_DIR/notes.txt"
 mkdir -p "$NOTES_DIR"
 touch "$NOTES_FILE"
 
-# Source shared colors
-source "$(dirname "${BASH_SOURCE[0]}")/../colors/colors.sh"
-
 notes_count() {
     [ -f "$NOTES_FILE" ] || { echo 0; return; }
     grep -c . "$NOTES_FILE"
