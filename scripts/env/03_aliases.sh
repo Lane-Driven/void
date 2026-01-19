@@ -1,7 +1,5 @@
 
-echo "DEV: env/03_aliases.sh"
-
-alias update="update_void"
+alias ud_system="system_update"
 # IMPORTANT
 alias install="sudo xbps-install -y"
 
@@ -46,4 +44,4 @@ git_help() {
     printf "Tip: You can add more aliases or explore 'git help -a' for all available commands.\n"
 }
 
-alias git_help="git_help"
+alias git_commands="git_help"

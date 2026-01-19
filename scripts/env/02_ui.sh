@@ -1,6 +1,4 @@
 
-echo "DEV: env/02_ui.sh"
-
 ui_git_branch() {
     if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
         branch=$(git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD 2>/dev/null)
@@ -20,4 +18,4 @@ ui_set_prompt() {
 }
 
 # Apply
-ui_set_prompt w
+ui_set_prompt

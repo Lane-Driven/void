@@ -1,7 +1,6 @@
 # -----------------------------
 # Shared terminal colors
 # -----------------------------
-echo "DEV: env/colors.sh"
 # ECHO Colors
 COLOR_RESET="\033[0m"
 

@@ -1,6 +1,4 @@
 
-echo "DEV: evn/03_notes.sh"
-
 # -----------------------------
 # Colorized Terminal Notes
 # -----------------------------

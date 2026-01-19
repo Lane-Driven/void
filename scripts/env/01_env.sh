@@ -1,3 +1,3 @@
-echo "DEV: /env/01_env.sh"
 
-# Environment variables that aren't colors.
+# Environment variables and exports
+export PATH="$HOME/bin:$PATH"
