@@ -9,7 +9,7 @@ source_scripts_dir() {
         [ -f "$f" ] && echo && source "$f"
         ((scripts_count++))  # NOT POSIX  use 'scripts_count=$((scripts_count+1))
     done < <(find "$SCRIPTS_DIR" -type f -name "*.sh" | sort)
-    echo "${COLOR_YELLOW}Scripts loaded: ${scripts_count}"
+    echo "$COLOR_YELLOW Scripts loaded: ${scripts_count} $COLOR_RESET"
 }
 
 source_scripts_dir
