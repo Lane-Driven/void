@@ -9,6 +9,7 @@ ui_git_branch() {
 }
 
 ui_set_prompt() {
+    echo $COLOR_RESET
     PS1=$(printf '%s[%s@%s %s\W%s%s%s] \$ ' \
         "$COLOR_GREEN" \
         "$USER"        \
