@@ -9,6 +9,7 @@ source_scripts_dir() {
         ((scripts_count++))  # NOT POSIX  use 'scripts_count=$((scripts_count+1))
     done < <(find "$SCRIPTS_DIR" -type f -name "*.sh" | sort)
     echo "Scripts cout = $scripts_count"
+    echo "COLOR_RESET = $COLOR_RESET"
 }
 
 source_scripts_dir
