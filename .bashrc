@@ -11,6 +11,7 @@ source_scripts_dir() {
         [ -f "$f" ] && echo "Sourcing: $f" && source "$f"
         ((scripts_count++))  # NOT POSIX  use 'scripts_count=$((scripts_count+1))
     done < <(find "$SCRIPTS_DIR" -type f -name "*.sh" | sort)
+    echo "DEVELOPMENT: scripts_count = $scripts_count"
 }
 
 source_scripts_dir
