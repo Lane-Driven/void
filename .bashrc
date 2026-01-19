@@ -4,7 +4,7 @@ SCRIPTS_DIR="$HOME/Projects/void/scripts/"
 source_scripts_dir() {
     [ -d "$SCRIPTS_DIR" ] && \
     while IFS= read -r f; do
-        [ -f "$f" ] && echo && source "$f"
+        [ -f "$f" ] && source "$f"
     done < <(find "$SCRIPTS_DIR" -type f -name "*.sh" | sort)
 }
 

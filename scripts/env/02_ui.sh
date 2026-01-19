@@ -7,7 +7,6 @@ ui_git_branch() {
 }
 
 ui_set_prompt() {
-    echo "Starting UI:"
     PS1=$(printf '%s[%s%s%s@%s %s\W%s %s%s%s] \$ ' \
         "$COLOR_RESET" \
         "$COLOR_GREEN" "$USER" \
