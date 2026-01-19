@@ -71,7 +71,7 @@ prompt_update() {
 # -----------------------------
 # Welcome screen
 # -----------------------------
-welcome_void() {
+welcome_me() {
     local LAST_UPDATE_OUT
     LAST_UPDATE_OUT=$(void_update_human)
 
@@ -97,5 +97,5 @@ welcome_void() {
 }
 
 # Automatically call on login
-welcome_void
+welcome_me
 
