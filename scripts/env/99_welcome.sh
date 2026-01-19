@@ -1,5 +1,5 @@
 
-echo "DEV: env/04_welcome.sh"
+echo "DEV: env/99_welcome.sh (loads last)"
 
 # -----------------------------
 # Show recent notes on welcome

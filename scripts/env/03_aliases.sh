@@ -1,5 +1,5 @@
 
-echo "DEV: env/aliases.sh"
+echo "DEV: env/03_aliases.sh"
 
 alias update="update_void"
 # IMPORTANT

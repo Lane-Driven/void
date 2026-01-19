@@ -1,3 +1,6 @@
+
+echo "DEV: env/03_pull_config.sh"
+
 # Function: update config 
 update_config() {
     local REPO_DIR="$HOME/Projects/void"

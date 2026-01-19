@@ -1,5 +1,5 @@
 
-echo "DEV: update_vim/update_vim.sh"
+echo "DEV: env/03_load_vimrc.sh"
 
 update_vimrc() {
     cd ~/Projects/void || return

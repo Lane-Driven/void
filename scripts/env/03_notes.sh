@@ -1,5 +1,5 @@
 
-echo "DEV: notes/notes.sh"
+echo "DEV: evn/03_notes.sh"
 
 # -----------------------------
 # Colorized Terminal Notes
