@@ -13,3 +13,5 @@ update_void() {
     sudo bash -c "date '+%Y-%m-%d %H:%M:%S' > '$LOGFILE'"
     echo "Update complete!"
 }
+
+update_void
