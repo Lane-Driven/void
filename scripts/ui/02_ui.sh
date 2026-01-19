@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-. "$SCRIPTS_DIR/colors/colors.sh"
+. "$SCRIPTS_DIR/colors/01_colors.sh"
 
 ui_git_branch() {
     if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
