@@ -1,6 +1,5 @@
 
 alias ud_system="system_update"
-# IMPORTANT
 alias install="sudo xbps-install -y"
 
 alias sysinfo="uname -a; lscpu; free -h; df -h"
