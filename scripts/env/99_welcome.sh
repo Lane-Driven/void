@@ -92,10 +92,33 @@ welcome_me() {
     echo -e "${COLOR_MAGENTA}Current directory: ${COLOR_CYAN}$PWD"
     echo -e "${COLOR_CYAN}=====================================${COLOR_RESET}"
     
+    # welcome_recent_notes
+    prompt_update
+}
+
+start_welcome() {
+    local LAST_UPDATE_OUT
+    LAST_UPDATE_OUT=$(void_update_human)
+
+    # OS info
+    local NAME ID KERNEL ARCH UPTIME
+    NAME=$(grep ^PRETTY_NAME= /etc/os-release | cut -d= -f2 | tr -d '"')
+    ID=$(grep ^ID= /etc/os-release | cut -d= -f2 | tr -d '"')
+    KERNEL=$(uname -r)
+    ARCH=$(uname -m)
+    UPTIME=$(uptime -p)
+
+    echo -e "${COLOR_CYAN}=====================================${COLOR_RESET}"
+    echo -e "${COLOR_GREEN}Welcome, ${COLOR_YELLOW}$USER${COLOR_GREEN}!"
+    echo -e "${COLOR_MAGENTA}System: ${COLOR_CYAN}$NAME (${ID})"
+    echo -e "${COLOR_MAGENTA}Kernel: ${COLOR_CYAN}$KERNEL [$ARCH]"
+    echo -e "${COLOR_MAGENTA}Last update: ${COLOR_CYAN}$LAST_UPDATE_OUT"
+    echo -e "${COLOR_MAGENTA}Uptime: ${COLOR_CYAN}$UPTIME"
+    echo -e "${COLOR_MAGENTA}Current directory: ${COLOR_CYAN}$PWD"
+    echo -e "${COLOR_CYAN}=====================================${COLOR_RESET}"
+    
     welcome_recent_notes
     prompt_update
 }
 
-# Automatically call on login
-welcome_me
-
+start_welcome
