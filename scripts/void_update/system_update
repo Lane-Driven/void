@@ -1,5 +1,5 @@
-
-echo "DEV: env/03_update.sh (update_void)"
+!#/usr/bin/env bash
+echo "DEV: xbps-install -Su (system update)... /var/log/void_update.log"
 
 update_void() {
     local LOGDIR="/var/log"
