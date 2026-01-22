@@ -1,5 +1,5 @@
-# Source all scripts in $HOME/Projects/void/scripts recursively
-SCRIPTS_DIR="$HOME/Projects/void/scripts/"
+# Source all scripts in $HOME/void/scripts recursively
+SCRIPTS_DIR="$HOME/void/scripts/"
 
 source_scripts_dir() {
     [ -d "$SCRIPTS_DIR" ] && \
