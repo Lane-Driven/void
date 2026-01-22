@@ -9,6 +9,14 @@ alias sysinfo="uname -a; lscpu; free -h; df -h"
 export EDITOR=vim
 alias svim="sudoedit"
 
+# runit service helpers
+alias svrestart="sudo sv restart"
+alias svstop="sudo sv stop"
+alias svstart="sudo sv start"
+alias svstatus="sudo sv status"
+alias svreload="sudo sv reload"
+alias svlogs="sudo sv log -f"
+
 alias ll='ls -lh --color=auto'
 alias la='ls -A --color=auto'
 
