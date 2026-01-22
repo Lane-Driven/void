@@ -1,6 +1,7 @@
 
 alias ud_system="system_update"
 alias install="sudo xbps-install -y"
+alias search="sudo xbps-query -S"
 
 alias sysinfo="uname -a; lscpu; free -h; df -h"
 
