@@ -4,6 +4,11 @@ alias install="sudo xbps-install -y"
 
 alias sysinfo="uname -a; lscpu; free -h; df -h"
 
+# Allow sudoedit to use vim instead of vi from my userspace
+# If I only have root ever available sudoedit will and should just use the untouched builtin 'vi'
+export EDITOR=vim
+alias svim="sudoedit"
+
 alias ll='ls -lh --color=auto'
 alias la='ls -A --color=auto'
 
