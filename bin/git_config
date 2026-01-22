@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 update_config() {
-    local REPO_DIR="$HOME/Projects/void"
+    local REPO_DIR="$HOME/void"
 
     # Check if directory exists
     if [ ! -d "$REPO_DIR" ]; then
