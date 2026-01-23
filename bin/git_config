@@ -21,7 +21,7 @@ update_config() {
 
     # Reload Bash shell
     echo "Reloading Bash..."
-    exec bash
+    source ~/.bashrc 
 }
 
 update_config
